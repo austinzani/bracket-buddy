@@ -23,11 +23,11 @@ const headerStyle: CSSProperties = {
 
 export function ChampionBanner({ champion }: ChampionBannerProps) {
   return (
-    <div style={containerStyle}>
+    <div data-champion-banner="" style={containerStyle}>
       <h1 style={headerStyle}>
         🏆 Bracket Complete!
       </h1>
-      <div style={{
+      <div data-champion-card="" style={{
         display: 'flex',
         justifyContent: 'center',
         marginBottom: '1rem',

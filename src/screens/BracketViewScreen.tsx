@@ -63,8 +63,15 @@ export function BracketViewScreen() {
     navigate(`/bracket/${bracket.bracketId}`)
   }
 
+  const printDate = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+
   return (
     <Layout>
+      {/* Print-only title */}
+      <div data-print-title="" style={{ display: 'none' }}>
+        {bracket.name}
+      </div>
+
       {/* Champion banner (only if complete) */}
       {isComplete && champion && (
         <ChampionBanner champion={champion} />
@@ -72,7 +79,7 @@ export function BracketViewScreen() {
 
       {/* Incomplete bracket header */}
       {!isComplete && (
-        <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+        <div data-print-hide="" style={{ textAlign: 'center', padding: '1.5rem 0' }}>
           <h1 style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>{bracket.name}</h1>
           <p style={{ color: 'var(--color-text-muted)' }}>
             {made} of {total} picks made
@@ -83,8 +90,13 @@ export function BracketViewScreen() {
       {/* Bracket tree */}
       <BracketTree teams={teams} picks={bracket.picks} />
 
+      {/* Print-only footer */}
+      <div data-print-footer="" style={{ display: 'none' }}>
+        Created with Bracket Buddies &middot; {printDate}
+      </div>
+
       {/* Action buttons */}
-      <div style={{
+      <div data-print-hide="" style={{
         display: 'flex',
         justifyContent: 'center',
         flexWrap: 'wrap',

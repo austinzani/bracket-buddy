@@ -222,7 +222,7 @@ export function BracketTree({ teams, picks }: BracketTreeProps) {
   if (games.size === 0) return null
 
   return (
-    <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+    <div data-bracket-tree="" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
       <div style={containerStyle}>
         {/* Left side: East and West (left-to-right flow) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

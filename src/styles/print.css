@@ -1,0 +1,114 @@
+@media print {
+  /* Page setup: landscape, tight margins */
+  @page {
+    size: landscape;
+    margin: 0.5cm;
+  }
+
+  /* Reset colors */
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 10px !important;
+  }
+
+  /* Hide all non-bracket UI */
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  /* Also hide buttons, nav, and other chrome generically */
+  button,
+  a[role="button"],
+  nav {
+    display: none !important;
+  }
+
+  /* Show the bracket tree */
+  [data-print-show] {
+    display: block !important;
+  }
+
+  /* Print bracket name header */
+  [data-print-title] {
+    display: block !important;
+    text-align: center;
+    font-size: 16px !important;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: #000000 !important;
+  }
+
+  /* Force bracket tree to use all available width */
+  [data-bracket-tree] {
+    overflow: visible !important;
+    width: 100% !important;
+  }
+
+  [data-bracket-tree] > div {
+    overflow: visible !important;
+    justify-content: center !important;
+  }
+
+  /* Simplify bracket slots for print */
+  [data-bracket-tree] img {
+    display: none !important;
+  }
+
+  /* Force white backgrounds on cards with dark text */
+  [data-bracket-tree] div[title] {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #999 !important;
+    opacity: 1 !important;
+  }
+
+  /* Keep winner slots with a subtle highlight */
+  [data-bracket-tree] div[title][style*="font-weight: 800"] {
+    background-color: #e8e8e8 !important;
+    font-weight: 800 !important;
+  }
+
+  /* Print footer */
+  [data-print-footer] {
+    display: block !important;
+    text-align: center;
+    font-size: 8px;
+    color: #999;
+    margin-top: 8px;
+    border-top: 1px solid #ddd;
+    padding-top: 4px;
+  }
+
+  /* Champion banner: simplify for print */
+  [data-champion-banner] {
+    padding: 8px 0 !important;
+  }
+
+  [data-champion-banner] h1 {
+    font-size: 14px !important;
+    background: none !important;
+    -webkit-text-fill-color: #000000 !important;
+    color: #000000 !important;
+  }
+
+  /* Hide the large champion TeamCard in print — name is enough */
+  [data-champion-card] {
+    display: none !important;
+  }
+
+  [data-champion-banner] p {
+    font-size: 12px !important;
+    color: #000000 !important;
+  }
+
+  /* Layout: remove padding/max-width constraints */
+  #root {
+    min-height: auto !important;
+  }
+
+  #root > div {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+}
