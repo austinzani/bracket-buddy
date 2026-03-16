@@ -361,7 +361,7 @@
     "secondaryColor": "#FFFFFF",
     "jerseyImage": "https://upload.wikimedia.org/wikipedia/commons/8/81/Kevin_Durant_Texas_Longhorns.jpg",
     "mascotImage": "https://a.espncdn.com/i/teamlogos/ncaa/500/251.png",
-    "mascotCostumeImage": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Bevo_XV_at_the_2019_Sugar_Bowl_%28cropped%29.jpg",
+    "mascotCostumeImage": "https://sportsdaydfw.imgix.net/1567791189-UTVW_AL041.JPG",
     "playInGameId": "PlayIn-G1",
     "_notes": "First Four (NC State vs Texas)"
   },
@@ -649,7 +649,7 @@
     "secondaryColor": "#FFC72C",
     "jerseyImage": "https://pvpanthers.com/images/2024/10/15/PVAMU_MBB_Team_Photo_2024_2025.jpg",
     "mascotImage": "https://a.espncdn.com/i/teamlogos/ncaa/500/2504.png",
-    "mascotCostumeImage": "https://pvpanthers.com/images/2022/9/13/PV_Panther_Mascot.jpg",
+    "mascotCostumeImage": "https://www.pvamu.edu/wp-content/uploads/2018/04/Mascots-.jpg",
     "playInGameId": "PlayIn-G2",
     "_notes": "First Four (Lehigh vs Prairie View A&M)"
   },
@@ -807,7 +807,7 @@
     "secondaryColor": "#FFFFFF",
     "jerseyImage": "https://miamiredhawks.com/images/2024/10/7/MBB_2024_25_Team_Photo.jpg",
     "mascotImage": "https://a.espncdn.com/i/teamlogos/ncaa/500/193.png",
-    "mascotCostumeImage": "https://upload.wikimedia.org/wikipedia/commons/0/06/Swoop_the_RedHawk.jpg",
+    "mascotCostumeImage": "https://miamioh.edu/news/_files/images/2025/10/25-swoop-new-costume-side-2.jpg",
     "playInGameId": "PlayIn-G3",
     "_notes": "First Four (SMU vs Miami OH)"
   },
@@ -887,7 +887,7 @@
     "secondaryColor": "#E51937",
     "jerseyImage": "https://hubison.com/images/2024/10/14/MBB_2024_25_Team.jpg",
     "mascotImage": "https://a.espncdn.com/i/teamlogos/ncaa/500/47.png",
-    "mascotCostumeImage": "https://upload.wikimedia.org/wikipedia/commons/d/d1/American_bison_k5680-1.jpg",
+    "mascotCostumeImage": "https://cdn1.apparelnbags.com/images/sports-leagues/ncaa-meac-bison-mascot.png",
     "playInGameId": "PlayIn-G4",
     "_notes": "First Four (UMBC vs Howard)"
   }

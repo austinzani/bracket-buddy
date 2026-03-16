@@ -312,11 +312,9 @@ function RegionBracket({
 
 /** Final Four + Championship center column */
 function CenterColumn({
-  games,
   picks,
   teams,
 }: {
-  games: Map<GameId, Game>
   picks: Record<GameId, string>
   teams: Team[]
 }) {
@@ -442,7 +440,7 @@ export function BracketTree({ teams, picks }: BracketTreeProps) {
         </div>
 
         {/* Center: Final Four + Championship */}
-        <CenterColumn games={games} picks={picks} teams={teams} />
+        <CenterColumn picks={picks} teams={teams} />
 
         {/* Right side: South on top, Midwest below (mirrored) */}
         <div data-bracket-side="" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
