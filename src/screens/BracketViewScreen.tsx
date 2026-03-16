@@ -60,15 +60,14 @@ export function BracketViewScreen() {
   }
 
   const handleShare = async () => {
-    const code = encodeBracket(bracket.name, bracket.picks)
-    const shareUrl = `${window.location.origin}/share?d=${code}`
+    const params = encodeBracket(bracket.name, bracket.picks, teams)
+    const shareUrl = `${window.location.origin}/share?${params}`
 
     // Use native share sheet on mobile if available
     if (navigator.share) {
       try {
         await navigator.share({
-          title: bracket.name,
-          text: `Check out my bracket: ${bracket.name}`,
+          title: `${bracket.name}'s Bracket`,
           url: shareUrl,
         })
         return

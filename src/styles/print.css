@@ -112,7 +112,7 @@
 
   /* Each side (left/right stack of 2 regions) */
   [data-bracket-side] {
-    gap: 4px !important;
+    gap: 3px !important;
   }
 
   /* Region (horizontal row of round columns) */
@@ -132,19 +132,22 @@
 
   /* Region / Final Four / Championship labels */
   [data-bracket-label] {
-    font-size: 6.5px !important;
+    font-size: 6px !important;
     margin-bottom: 1px !important;
     letter-spacing: 0.5px !important;
   }
 
-  /* === BRACKET SLOTS: compact to fit single page with browser chrome === */
+  /* === BRACKET SLOTS ===
+   * Width budget: 2 × (5×92 + 4×8) + 58 + 4 = 986px — fits 1027px landscape page.
+   * min-width 80px + font 7px keeps "14 North Dakota St." readable without truncation.
+   */
   [data-bracket-slot] {
     height: 15px !important;
     min-height: 15px !important;
     max-height: 15px !important;
-    min-width: 70px !important;
+    min-width: 80px !important;
     max-width: 92px !important;
-    padding: 1px 3px !important;
+    padding: 1px 4px !important;
     font-size: 7px !important;
     gap: 2px !important;
     border-radius: 2px !important;
@@ -179,8 +182,8 @@
 
   /* SVG connector columns */
   [data-connector] {
-    width: 14px !important;
-    min-width: 14px !important;
+    width: 8px !important;
+    min-width: 8px !important;
   }
 
   [data-connector] svg {
@@ -188,14 +191,14 @@
   }
 
   [data-connector] path {
-    stroke-width: 0.65px !important;
+    stroke-width: 0.5px !important;
   }
 
   /* Center column */
   [data-center-column] {
-    min-width: 70px !important;
+    min-width: 58px !important;
     gap: 4px !important;
-    padding: 0 3px !important;
+    padding: 0 2px !important;
   }
 
   /* Champion slot in center */
@@ -240,7 +243,7 @@
 }
 
 .print-mode [data-bracket-side] {
-  gap: 4px !important;
+  gap: 3px !important;
 }
 
 .print-mode [data-bracket-inputs] {
@@ -251,9 +254,9 @@
   height: 15px !important;
   min-height: 15px !important;
   max-height: 15px !important;
-  min-width: 70px !important;
+  min-width: 80px !important;
   max-width: 92px !important;
-  padding: 1px 3px !important;
+  padding: 1px 4px !important;
   font-size: 7px !important;
   gap: 2px !important;
   border-radius: 2px !important;
@@ -273,18 +276,18 @@
 }
 
 .print-mode [data-connector] {
-  width: 14px !important;
-  min-width: 14px !important;
+  width: 8px !important;
+  min-width: 8px !important;
 }
 
 .print-mode [data-connector] path {
-  stroke-width: 0.65px !important;
+  stroke-width: 0.5px !important;
 }
 
 .print-mode [data-center-column] {
-  min-width: 70px !important;
+  min-width: 58px !important;
   gap: 4px !important;
-  padding: 0 3px !important;
+  padding: 0 2px !important;
 }
 
 .print-mode [data-champion-slot] {
@@ -296,7 +299,7 @@
 }
 
 .print-mode [data-bracket-label] {
-  font-size: 6.5px !important;
+  font-size: 6px !important;
   margin-bottom: 1px !important;
   letter-spacing: 0.5px !important;
 }

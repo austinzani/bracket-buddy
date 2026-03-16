@@ -1,33 +1,16 @@
-import type { GameId } from '../types'
+import type { GameId, Team } from '../types'
+import { generateBracketGames, getRoundByRoundOrder, getGameParticipants } from './bracket'
 
 interface SharePayload {
   name: string
   picks: Record<GameId, string>
 }
 
-/**
- * Encode a bracket's name and picks into a URL-safe base64 string.
- */
-export function encodeBracket(name: string, picks: Record<GameId, string>): string {
-  const payload: SharePayload = { name, picks }
-  const json = JSON.stringify(payload)
-  // btoa only handles Latin1, so encode to UTF-8 first
-  const encoded = btoa(
-    new TextEncoder().encode(json).reduce((s, b) => s + String.fromCharCode(b), '')
-  )
-  // Make URL-safe: replace +/= with -_
-  return encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-}
+// --- V1: Legacy JSON-based encoding (kept for backward compat) ---
 
-/**
- * Decode a URL-safe base64 share code back into name + picks.
- * Returns null if the code is invalid.
- */
-export function decodeBracket(code: string): SharePayload | null {
+function decodeBracketV1(code: string): SharePayload | null {
   try {
-    // Restore standard base64
     let b64 = code.replace(/-/g, '+').replace(/_/g, '/')
-    // Add back padding
     while (b64.length % 4 !== 0) b64 += '='
 
     const binary = atob(b64)
@@ -43,4 +26,124 @@ export function decodeBracket(code: string): SharePayload | null {
   } catch {
     return null
   }
+}
+
+// --- V2: Compact bit-per-pick encoding ---
+// Each pick is encoded as "0" (sourceA won) or "1" (sourceB won)
+// in deterministic game order. ~67 chars for picks + URL-encoded name.
+
+/**
+ * Encode picks compactly: one character per pick in deterministic game order.
+ * "0" = first participant (sourceA) won, "1" = second participant (sourceB) won.
+ */
+function encodeBracketV2(
+  picks: Record<GameId, string>,
+  teams: Team[],
+): string {
+  const games = generateBracketGames(teams)
+  const order = getRoundByRoundOrder(games)
+
+  let bits = ''
+  for (const gameId of order) {
+    const winner = picks[gameId]
+    if (!winner) {
+      bits += '-' // unpicked
+      continue
+    }
+
+    const [teamA, teamB] = getGameParticipants(gameId, games, picks)
+
+    if (winner === teamA) {
+      bits += '0'
+    } else if (winner === teamB) {
+      bits += '1'
+    } else {
+      bits += '-' // shouldn't happen, but be safe
+    }
+  }
+
+  // Trim trailing dashes (unpicked games at the end)
+  bits = bits.replace(/-+$/, '')
+
+  return bits
+}
+
+/**
+ * Decode compact picks string back into full picks record.
+ * Walks through games in order, resolving participants from prior picks.
+ */
+function decodeBracketV2(
+  bits: string,
+  teams: Team[],
+): Record<GameId, string> | null {
+  try {
+    const games = generateBracketGames(teams)
+    const order = getRoundByRoundOrder(games)
+    const picks: Record<GameId, string> = {}
+
+    for (let i = 0; i < order.length; i++) {
+      const bit = i < bits.length ? bits[i] : '-'
+      if (bit === '-') continue
+
+      const gameId = order[i]
+      const [teamA, teamB] = getGameParticipants(gameId, games, picks)
+
+      if (bit === '0' && teamA) {
+        picks[gameId] = teamA
+      } else if (bit === '1' && teamB) {
+        picks[gameId] = teamB
+      }
+      // If participants aren't resolved yet, skip (shouldn't happen with valid data)
+    }
+
+    return picks
+  } catch {
+    return null
+  }
+}
+
+// --- Public API ---
+
+/**
+ * Encode a bracket for sharing. Uses compact V2 format.
+ * Returns query string parameters (without leading ?).
+ */
+export function encodeBracket(
+  name: string,
+  picks: Record<GameId, string>,
+  teams: Team[],
+): string {
+  const bits = encodeBracketV2(picks, teams)
+  const params = new URLSearchParams({ v: '2', n: name, p: bits })
+  return params.toString()
+}
+
+/**
+ * Decode a shared bracket from URL search params.
+ * Supports both V1 (legacy) and V2 (compact) formats.
+ */
+export function decodeBracket(
+  searchParams: URLSearchParams,
+  teams: Team[],
+): SharePayload | null {
+  const version = searchParams.get('v')
+
+  if (version === '2') {
+    const name = searchParams.get('n')
+    const bits = searchParams.get('p')
+    if (!name || !bits) return null
+
+    const picks = decodeBracketV2(bits, teams)
+    if (!picks) return null
+
+    return { name, picks }
+  }
+
+  // V1 fallback: single 'd' parameter with base64 JSON
+  const code = searchParams.get('d')
+  if (code) {
+    return decodeBracketV1(code)
+  }
+
+  return null
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useBrackets } from '../hooks/useBrackets'
+import { useTeams } from '../hooks/useTeams'
 import { decodeBracket } from '../data/shareCode'
 import { Layout } from '../components/Layout'
 import { LoadingState } from '../components/LoadingState'
@@ -10,27 +11,29 @@ export function ImportScreen() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { importBracket } = useBrackets()
+  const { teams, loading: teamsLoading, error: teamsError } = useTeams()
   const imported = useRef(false)
 
-  const code = searchParams.get('d')
-
   useEffect(() => {
-    if (imported.current || !code) return
-    imported.current = true
+    if (imported.current || teamsLoading || teams.length === 0) return
 
-    const payload = decodeBracket(code)
+    const payload = decodeBracket(searchParams, teams)
     if (!payload) return
 
+    imported.current = true
     const bracket = importBracket(payload.name, payload.picks)
     navigate(`/bracket/${bracket.bracketId}/view`, { replace: true })
-  }, [code, importBracket, navigate])
+  }, [searchParams, teams, teamsLoading, importBracket, navigate])
 
-  if (!code) {
+  if (teamsLoading) {
+    return <Layout><LoadingState message="Loading..." /></Layout>
+  }
+
+  if (teamsError) {
     return (
       <Layout>
         <ErrorState
-          title="Invalid Link"
-          message="This share link is missing data."
+          message={`Failed to load teams: ${teamsError}`}
           onRetry={() => navigate('/')}
           retryLabel="Go Home"
         />
@@ -38,7 +41,8 @@ export function ImportScreen() {
     )
   }
 
-  const payload = decodeBracket(code)
+  // Check if the link is valid (for immediate error display)
+  const payload = decodeBracket(searchParams, teams)
   if (!payload) {
     return (
       <Layout>
