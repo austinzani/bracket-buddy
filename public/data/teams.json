@@ -348,7 +348,22 @@
     "jerseyImage": "https://upload.wikimedia.org/wikipedia/commons/e/e0/David_Thompson_NC_State.jpg",
     "mascotImage": "https://a.espncdn.com/i/teamlogos/ncaa/500/152.png",
     "mascotCostumeImage": "https://www.midtownmag.com/wp-content/uploads/2025/11/wuf_1.jpg",
-    "_notes": "First Four winner (NC State vs Texas); jerseyImage and mascotCostumeImage are placeholders; replace with Mr. and Mrs. Wuf mascot costume photo and jersey image"
+    "playInGameId": "PlayIn-G1",
+    "_notes": "First Four (NC State vs Texas)"
+  },
+  {
+    "id": "texas",
+    "name": "Texas Longhorns",
+    "shortName": "Texas",
+    "seed": 11,
+    "region": "West",
+    "primaryColor": "#BF5700",
+    "secondaryColor": "#FFFFFF",
+    "jerseyImage": "https://upload.wikimedia.org/wikipedia/commons/8/81/Kevin_Durant_Texas_Longhorns.jpg",
+    "mascotImage": "https://a.espncdn.com/i/teamlogos/ncaa/500/251.png",
+    "mascotCostumeImage": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Bevo_XV_at_the_2019_Sugar_Bowl_%28cropped%29.jpg",
+    "playInGameId": "PlayIn-G1",
+    "_notes": "First Four (NC State vs Texas)"
   },
   {
     "id": "high-point",
@@ -621,7 +636,22 @@
     "jerseyImage": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Lehigh_at_MSU_%286561016327%29.jpg",
     "mascotImage": "https://a.espncdn.com/i/teamlogos/ncaa/500/2329.png",
     "mascotCostumeImage": "https://upload.wikimedia.org/wikipedia/commons/7/76/Red-tailed_hawk_%2844371%29.jpg",
-    "_notes": "First Four winner (Lehigh vs Prairie View A&M); jerseyImage and mascotCostumeImage are placeholders; replace with Clutch the Mountain Hawk mascot costume photo and jersey image"
+    "playInGameId": "PlayIn-G2",
+    "_notes": "First Four (Lehigh vs Prairie View A&M)"
+  },
+  {
+    "id": "prairie-view",
+    "name": "Prairie View A&M Panthers",
+    "shortName": "Prairie View",
+    "seed": 16,
+    "region": "South",
+    "primaryColor": "#4F2683",
+    "secondaryColor": "#FFC72C",
+    "jerseyImage": "https://pvpanthers.com/images/2024/10/15/PVAMU_MBB_Team_Photo_2024_2025.jpg",
+    "mascotImage": "https://a.espncdn.com/i/teamlogos/ncaa/500/2504.png",
+    "mascotCostumeImage": "https://pvpanthers.com/images/2022/9/13/PV_Panther_Mascot.jpg",
+    "playInGameId": "PlayIn-G2",
+    "_notes": "First Four (Lehigh vs Prairie View A&M)"
   },
   {
     "id": "michigan",
@@ -764,7 +794,22 @@
     "jerseyImage": "https://smumustangs.com/images/2025/10/17/Edwards_BJ-2025-26.jpg",
     "mascotImage": "https://a.espncdn.com/i/teamlogos/ncaa/500/2567.png",
     "mascotCostumeImage": "https://www.smu.edu/-/media/site/studentaffairs/band/peruna/perunaix_footballgame_f23.jpg",
-    "_notes": "First Four winner (SMU vs Miami OH); jerseyImage and mascotCostumeImage are placeholders; replace with Peruna the Mustang mascot photo and jersey image"
+    "playInGameId": "PlayIn-G3",
+    "_notes": "First Four (SMU vs Miami OH)"
+  },
+  {
+    "id": "miami-oh",
+    "name": "Miami (OH) RedHawks",
+    "shortName": "Miami OH",
+    "seed": 11,
+    "region": "Midwest",
+    "primaryColor": "#C3142D",
+    "secondaryColor": "#FFFFFF",
+    "jerseyImage": "https://miamiredhawks.com/images/2024/10/7/MBB_2024_25_Team_Photo.jpg",
+    "mascotImage": "https://a.espncdn.com/i/teamlogos/ncaa/500/193.png",
+    "mascotCostumeImage": "https://upload.wikimedia.org/wikipedia/commons/0/06/Swoop_the_RedHawk.jpg",
+    "playInGameId": "PlayIn-G3",
+    "_notes": "First Four (SMU vs Miami OH)"
   },
   {
     "id": "akron",
@@ -829,6 +874,21 @@
     "jerseyImage": "https://umbcretrievers.com/images/2025/8/11/Ace2.png",
     "mascotImage": "https://a.espncdn.com/i/teamlogos/ncaa/500/2378.png",
     "mascotCostumeImage": "https://www.bobbleheadhall.com/wp-content/uploads/2018/06/1-6.jpg",
-    "_notes": "First Four winner (UMBC vs Howard); jerseyImage and mascotCostumeImage are placeholders; replace with True Grit the Chesapeake Bay Retriever mascot costume photo and jersey image"
+    "playInGameId": "PlayIn-G4",
+    "_notes": "First Four (UMBC vs Howard)"
+  },
+  {
+    "id": "howard",
+    "name": "Howard Bison",
+    "shortName": "Howard",
+    "seed": 16,
+    "region": "Midwest",
+    "primaryColor": "#003A63",
+    "secondaryColor": "#E51937",
+    "jerseyImage": "https://hubison.com/images/2024/10/14/MBB_2024_25_Team.jpg",
+    "mascotImage": "https://a.espncdn.com/i/teamlogos/ncaa/500/47.png",
+    "mascotCostumeImage": "https://upload.wikimedia.org/wikipedia/commons/d/d1/American_bison_k5680-1.jpg",
+    "playInGameId": "PlayIn-G4",
+    "_notes": "First Four (UMBC vs Howard)"
   }
 ]
