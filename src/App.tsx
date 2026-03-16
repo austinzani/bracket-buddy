@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { HomeScreen } from './screens/HomeScreen'
 import { CreateBracketScreen } from './screens/CreateBracketScreen'
+import { PickFlowScreen } from './screens/PickFlowScreen'
 import { Layout } from './components/Layout'
 
 function Placeholder({ name }: { name: string }) {
@@ -20,7 +21,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomeScreen />} />
         <Route path="/new" element={<CreateBracketScreen />} />
-        <Route path="/bracket/:id" element={<Placeholder name="Pick Flow" />} />
+        <Route path="/bracket/:id" element={<PickFlowScreen />} />
         <Route path="/bracket/:id/view" element={<Placeholder name="Bracket View" />} />
       </Routes>
     </BrowserRouter>
