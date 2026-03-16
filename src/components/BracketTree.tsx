@@ -1,6 +1,6 @@
 import { useMemo, type CSSProperties } from 'react'
 import type { Team, GameId, Game, Region } from '../types'
-import { generateBracketGames, getGameParticipants } from '../data/bracket'
+import { generateBracketGames } from '../data/bracket'
 import { getTeamById } from '../data/teams'
 import { BracketSlot } from './BracketSlot'
 
@@ -9,48 +9,165 @@ interface BracketTreeProps {
   picks: Record<GameId, string>
 }
 
-/** Render a single matchup: two slots stacked with a connector */
-function Matchup({
+/* ─── Slot dimensions (used for connector math) ─── */
+const SLOT_H = 28
+const SLOT_GAP = 4 // vertical gap between two slots in a matchup
+const ROUND_GAP = 24 // horizontal gap between rounds (where connector lines live)
+const CONNECTOR_W = 16 // width of the bracket connector arm
+
+/* ─── Colors ─── */
+const LINE_COLOR = 'var(--color-border, #ccc)'
+const LINE_W = 1.5
+
+/**
+ * Recursive component: renders one game as a traditional bracket.
+ * - For R1 games: two BracketSlots stacked vertically
+ * - For later rounds: two child BracketGame subtrees connected by bracket lines,
+ *   with the winner BracketSlot at the output.
+ */
+function BracketGame({
   gameId,
   games,
   picks,
   teams,
-  alignRight,
+  reverse,
 }: {
   gameId: GameId
   games: Map<GameId, Game>
   picks: Record<GameId, string>
   teams: Team[]
-  alignRight?: boolean
+  reverse?: boolean // right-side regions flow right-to-left
 }) {
-  const [teamAId, teamBId] = getGameParticipants(gameId, games, picks)
-  const teamA = teamAId ? getTeamById(teams, teamAId) : undefined
-  const teamB = teamBId ? getTeamById(teams, teamBId) : undefined
+  const game = games.get(gameId)
+  if (!game) return null
+
   const winnerId = picks[gameId]
+
+  if (game.isFirstRound) {
+    // R1: just two team slots stacked
+    const teamA = game.sourceA ? getTeamById(teams, game.sourceA) : undefined
+    const teamB = game.sourceB ? getTeamById(teams, game.sourceB) : undefined
+    return (
+      <div data-matchup="" style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        gap: SLOT_GAP,
+      }}>
+        <BracketSlot
+          team={teamA ?? null}
+          isWinner={winnerId !== undefined && winnerId === game.sourceA}
+          compact
+        />
+        <BracketSlot
+          team={teamB ?? null}
+          isWinner={winnerId !== undefined && winnerId === game.sourceB}
+          compact
+        />
+      </div>
+    )
+  }
+
+  // R2+: recurse into source games, draw connector, show winner slot
+  const winnerTeam = winnerId ? getTeamById(teams, winnerId) : undefined
 
   return (
     <div style={{
       display: 'flex',
-      flexDirection: 'column',
-      gap: 2,
-      alignItems: alignRight ? 'flex-end' : 'flex-start',
+      flexDirection: reverse ? 'row-reverse' : 'row',
+      alignItems: 'center',
     }}>
+      {/* Two source subtrees stacked vertically */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        gap: SLOT_GAP,
+      }}>
+        <BracketGame
+          gameId={game.sourceA}
+          games={games}
+          picks={picks}
+          teams={teams}
+          reverse={reverse}
+        />
+        <BracketGame
+          gameId={game.sourceB}
+          games={games}
+          picks={picks}
+          teams={teams}
+          reverse={reverse}
+        />
+      </div>
+
+      {/* Bracket connector lines */}
+      <BracketConnector reverse={reverse} />
+
+      {/* Winner slot at the output */}
       <BracketSlot
-        team={teamA ?? null}
-        isWinner={winnerId !== undefined && winnerId === teamAId}
-        compact
-      />
-      <BracketSlot
-        team={teamB ?? null}
-        isWinner={winnerId !== undefined && winnerId === teamBId}
+        team={winnerTeam ?? null}
+        isWinner={winnerId !== undefined}
         compact
       />
     </div>
   )
 }
 
-/** Render a full region column (R1 through R4) */
-function RegionColumn({
+/**
+ * The "]" or "[" shaped connector.
+ * Two horizontal arms (top/bottom) that meet at a vertical bar,
+ * then a single horizontal arm extending out to the winner slot.
+ */
+function BracketConnector({ reverse }: { reverse?: boolean }) {
+  const borderSide = reverse ? 'Left' : 'Right'
+  const otherSide = reverse ? 'Right' : 'Left'
+
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: reverse ? 'row-reverse' : 'row',
+      alignItems: 'center',
+      width: ROUND_GAP,
+      minWidth: ROUND_GAP,
+      alignSelf: 'stretch',
+    }}>
+      {/* Two-arm bracket: top arm + bottom arm with vertical connector */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
+        alignSelf: 'stretch',
+      }}>
+        {/* Top arm */}
+        <div style={{
+          flex: 1,
+          [`border${borderSide}` as string]: `${LINE_W}px solid ${LINE_COLOR}`,
+          borderBottom: `${LINE_W}px solid ${LINE_COLOR}`,
+          minHeight: SLOT_H / 2,
+        }} />
+        {/* Bottom arm */}
+        <div style={{
+          flex: 1,
+          [`border${borderSide}` as string]: `${LINE_W}px solid ${LINE_COLOR}`,
+          borderTop: `${LINE_W}px solid ${LINE_COLOR}`,
+          minHeight: SLOT_H / 2,
+        }} />
+      </div>
+      {/* Horizontal line out to the winner slot */}
+      <div style={{
+        width: CONNECTOR_W / 2,
+        minWidth: CONNECTOR_W / 2,
+        height: 0,
+        borderTop: `${LINE_W}px solid ${LINE_COLOR}`,
+      }} />
+    </div>
+  )
+}
+
+/**
+ * Renders a full region bracket recursively from its R4 root game.
+ */
+function RegionBracket({
   region,
   games,
   picks,
@@ -63,48 +180,18 @@ function RegionColumn({
   teams: Team[]
   reverse?: boolean
 }) {
-  const rounds = [1, 2, 3, 4]
-  const gameCounts = [8, 4, 2, 1]
-  const displayRounds = reverse ? [...rounds].reverse() : rounds
+  const rootGameId = `${region}-R4-G1`
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: reverse ? 'row-reverse' : 'row',
-      alignItems: 'center',
-      gap: 4,
-    }}>
-      {displayRounds.map((round) => {
-        const count = gameCounts[round - 1]
-        const gameIds = Array.from({ length: count }, (_, i) => `${region}-R${round}-G${i + 1}`)
-        // Spacing increases each round to visually align brackets
-        const gap = round === 1 ? 8 : round === 2 ? 24 : round === 3 ? 56 : 120
-
-        return (
-          <div
-            key={round}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-around',
-              gap,
-              minHeight: round === 1 ? undefined : 0,
-              flex: round === 1 ? '0 0 auto' : '1 1 0',
-            }}
-          >
-            {gameIds.map((gid) => (
-              <Matchup
-                key={gid}
-                gameId={gid}
-                games={games}
-                picks={picks}
-                teams={teams}
-                alignRight={reverse}
-              />
-            ))}
-          </div>
-        )
-      })}
+    <div data-region="" style={{ display: 'flex', flexDirection: 'column' }}>
+      <div data-bracket-label="" style={regionLabelStyle}>{region}</div>
+      <BracketGame
+        gameId={rootGameId}
+        games={games}
+        picks={picks}
+        teams={teams}
+        reverse={reverse}
+      />
     </div>
   )
 }
@@ -119,8 +206,17 @@ function CenterColumn({
   picks: Record<GameId, string>
   teams: Team[]
 }) {
+  const championId = picks['Championship']
+  const champion = championId ? getTeamById(teams, championId) : undefined
+
+  // Final Four G1 participants
+  const ff1WinnerId = picks['FinalFour-G1']
+  const ff1Winner = ff1WinnerId ? getTeamById(teams, ff1WinnerId) : undefined
+  const ff2WinnerId = picks['FinalFour-G2']
+  const ff2Winner = ff2WinnerId ? getTeamById(teams, ff2WinnerId) : undefined
+
   return (
-    <div style={{
+    <div data-center-column="" style={{
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -129,23 +225,37 @@ function CenterColumn({
       padding: '0 8px',
       minWidth: 160,
     }}>
-      <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>
-        Final Four
+      {/* Final Four G1 winner */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+        <div data-bracket-label="" style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>
+          Final Four
+        </div>
+        <BracketSlot
+          team={ff1Winner ?? null}
+          isWinner={ff1WinnerId !== undefined}
+          compact
+        />
       </div>
-      <Matchup gameId="FinalFour-G1" games={games} picks={picks} teams={teams} />
-      <div style={{
-        padding: '8px 0',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 4,
-      }}>
-        <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>
+
+      {/* Championship */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+        <div data-bracket-label="" style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>
           Championship
         </div>
         <ChampionSlot gameId="Championship" picks={picks} teams={teams} />
       </div>
-      <Matchup gameId="FinalFour-G2" games={games} picks={picks} teams={teams} />
+
+      {/* Final Four G2 winner */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+        <div data-bracket-label="" style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>
+          Final Four
+        </div>
+        <BracketSlot
+          team={ff2Winner ?? null}
+          isWinner={ff2WinnerId !== undefined}
+          compact
+        />
+      </div>
     </div>
   )
 }
@@ -164,7 +274,7 @@ function ChampionSlot({
 
   if (!winner) {
     return (
-      <div style={{
+      <div data-champion-slot="" style={{
         padding: '8px 16px',
         borderRadius: 8,
         backgroundColor: '#f0f0f0',
@@ -180,7 +290,7 @@ function ChampionSlot({
   }
 
   return (
-    <div style={{
+    <div data-champion-slot="" style={{
       padding: '8px 16px',
       borderRadius: 8,
       backgroundColor: winner.primaryColor,
@@ -194,16 +304,6 @@ function ChampionSlot({
       🏆 {winner.seed} {winner.shortName}
     </div>
   )
-}
-
-const containerStyle: CSSProperties = {
-  display: 'flex',
-  alignItems: 'stretch',
-  justifyContent: 'center',
-  overflowX: 'auto',
-  padding: '1rem 0',
-  gap: 4,
-  minWidth: 0,
 }
 
 const regionLabelStyle: CSSProperties = {
@@ -223,32 +323,27 @@ export function BracketTree({ teams, picks }: BracketTreeProps) {
 
   return (
     <div data-bracket-tree="" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-      <div style={containerStyle}>
-        {/* Left side: East and West (left-to-right flow) */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div>
-            <div style={regionLabelStyle}>East</div>
-            <RegionColumn region="East" games={games} picks={picks} teams={teams} />
-          </div>
-          <div>
-            <div style={regionLabelStyle}>West</div>
-            <RegionColumn region="West" games={games} picks={picks} teams={teams} />
-          </div>
+      <div data-bracket-container="" style={{
+        display: 'flex',
+        alignItems: 'stretch',
+        justifyContent: 'center',
+        padding: '0.5rem 0',
+        gap: 4,
+        minWidth: 'min-content',
+      }}>
+        {/* Left side: East on top, West below — flow left-to-right */}
+        <div data-bracket-side="" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <RegionBracket region="East" games={games} picks={picks} teams={teams} />
+          <RegionBracket region="West" games={games} picks={picks} teams={teams} />
         </div>
 
         {/* Center: Final Four + Championship */}
         <CenterColumn games={games} picks={picks} teams={teams} />
 
-        {/* Right side: South and Midwest (right-to-left flow, mirrored) */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div>
-            <div style={regionLabelStyle}>South</div>
-            <RegionColumn region="South" games={games} picks={picks} teams={teams} reverse />
-          </div>
-          <div>
-            <div style={regionLabelStyle}>Midwest</div>
-            <RegionColumn region="Midwest" games={games} picks={picks} teams={teams} reverse />
-          </div>
+        {/* Right side: South on top, Midwest below — flow right-to-left (mirrored) */}
+        <div data-bracket-side="" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <RegionBracket region="South" games={games} picks={picks} teams={teams} reverse />
+          <RegionBracket region="Midwest" games={games} picks={picks} teams={teams} reverse />
         </div>
       </div>
     </div>

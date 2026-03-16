@@ -1,114 +1,196 @@
 @media print {
-  /* Page setup: landscape, tight margins */
+  /* Landscape 8.5×11 with minimal margins */
   @page {
-    size: landscape;
-    margin: 0.5cm;
+    size: 11in 8.5in;
+    margin: 0.2in;
   }
 
-  /* Reset colors */
+  /* Reset everything */
+  * {
+    box-sizing: border-box !important;
+  }
+
   body {
     background: #ffffff !important;
     color: #000000 !important;
-    font-size: 10px !important;
+    font-size: 6px !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
-  /* Hide all non-bracket UI */
-  [data-print-hide] {
-    display: none !important;
+  /* Kill ALL page breaks everywhere */
+  html, body, #root, #root > div,
+  [data-bracket-tree],
+  [data-bracket-container],
+  [data-bracket-side],
+  [data-region],
+  [data-center-column],
+  [data-matchup] {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    page-break-before: avoid !important;
+    break-before: avoid !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
   }
 
-  /* Also hide buttons, nav, and other chrome generically */
+  html, body, #root {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+
+  #root > div {
+    max-width: none !important;
+    padding: 2px !important;
+    min-height: auto !important;
+    height: auto !important;
+  }
+
+  /* Hide UI chrome */
+  [data-print-hide],
   button,
   a[role="button"],
   nav {
     display: none !important;
   }
 
-  /* Show the bracket tree */
-  [data-print-show] {
-    display: block !important;
-  }
-
-  /* Print bracket name header */
+  /* === TITLE === */
   [data-print-title] {
     display: block !important;
     text-align: center;
-    font-size: 16px !important;
+    font-size: 9px !important;
     font-weight: 800;
-    margin-bottom: 8px;
+    margin: 0 0 1px 0 !important;
+    padding: 0 !important;
     color: #000000 !important;
   }
 
-  /* Force bracket tree to use all available width */
+  /* === CHAMPION BANNER: compact single line === */
+  [data-champion-banner] {
+    padding: 0 0 1px 0 !important;
+    gap: 4px !important;
+    margin: 0 !important;
+  }
+
+  [data-champion-banner] h1 {
+    font-size: 7px !important;
+    background: none !important;
+    -webkit-text-fill-color: #000000 !important;
+    color: #000000 !important;
+    margin: 0 !important;
+  }
+
+  [data-champion-banner] > div {
+    font-size: 7px !important;
+    padding: 1px 4px !important;
+    border-radius: 2px !important;
+  }
+
+  [data-champion-banner] img {
+    width: 10px !important;
+    height: 10px !important;
+  }
+
+  [data-champion-card] {
+    display: none !important;
+  }
+
+  /* === BRACKET TREE === */
   [data-bracket-tree] {
     overflow: visible !important;
     width: 100% !important;
   }
 
-  [data-bracket-tree] > div {
-    overflow: visible !important;
+  /* Main container */
+  [data-bracket-container] {
+    gap: 2px !important;
+    padding: 0 !important;
     justify-content: center !important;
+    overflow: visible !important;
   }
 
-  /* Simplify bracket slots for print */
-  [data-bracket-tree] img {
-    display: none !important;
+  /* Each side (left/right stack of 2 regions) */
+  [data-bracket-side] {
+    gap: 4px !important;
   }
 
-  /* Force white backgrounds on cards with dark text */
-  [data-bracket-tree] div[title] {
+  /* Region (horizontal row of round columns) */
+  [data-region] {
+    gap: 1px !important;
+  }
+
+  /* Individual matchups */
+  [data-matchup] {
+    gap: 1px !important;
+  }
+
+  /* Region / Final Four / Championship labels */
+  [data-bracket-label] {
+    font-size: 5px !important;
+    margin-bottom: 1px !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  /* === BRACKET SLOTS: dramatically smaller === */
+  [data-bracket-slot] {
+    height: 11px !important;
+    min-height: 11px !important;
+    max-height: 11px !important;
+    min-width: 48px !important;
+    max-width: 68px !important;
+    padding: 0px 2px !important;
+    font-size: 5px !important;
+    gap: 2px !important;
+    border-radius: 1px !important;
+    border-width: 0.5px !important;
     background-color: #ffffff !important;
     color: #000000 !important;
-    border: 1px solid #999 !important;
+    opacity: 1 !important;
+    line-height: 1 !important;
+  }
+
+  /* Winner slot highlight */
+  [data-winner] {
+    background-color: #e0e0e0 !important;
+    font-weight: 700 !important;
+  }
+
+  /* Slot inner spans */
+  [data-bracket-slot] span {
+    font-size: 5px !important;
     opacity: 1 !important;
   }
 
-  /* Keep winner slots with a subtle highlight */
-  [data-bracket-tree] div[title][style*="font-weight: 800"] {
-    background-color: #e8e8e8 !important;
-    font-weight: 800 !important;
-  }
-
-  /* Print footer */
-  [data-print-footer] {
-    display: block !important;
-    text-align: center;
-    font-size: 8px;
-    color: #999;
-    margin-top: 8px;
-    border-top: 1px solid #ddd;
-    padding-top: 4px;
-  }
-
-  /* Champion banner: simplify for print */
-  [data-champion-banner] {
-    padding: 8px 0 !important;
-  }
-
-  [data-champion-banner] h1 {
-    font-size: 14px !important;
-    background: none !important;
-    -webkit-text-fill-color: #000000 !important;
-    color: #000000 !important;
-  }
-
-  /* Hide the large champion TeamCard in print — name is enough */
-  [data-champion-card] {
+  /* Hide images in slots */
+  [data-bracket-slot] img {
     display: none !important;
   }
 
-  [data-champion-banner] p {
-    font-size: 12px !important;
-    color: #000000 !important;
+  /* Center column */
+  [data-center-column] {
+    min-width: 55px !important;
+    gap: 4px !important;
+    padding: 0 2px !important;
   }
 
-  /* Layout: remove padding/max-width constraints */
-  #root {
-    min-height: auto !important;
+  /* Champion slot in center */
+  [data-champion-slot] {
+    font-size: 6px !important;
+    padding: 2px 4px !important;
+    border-radius: 2px !important;
+    border-width: 1px !important;
+    box-shadow: none !important;
   }
 
-  #root > div {
-    max-width: none !important;
-    padding: 0 !important;
+  /* === FOOTER === */
+  [data-print-footer] {
+    display: block !important;
+    text-align: center;
+    font-size: 5px;
+    color: #999;
+    margin-top: 1px;
+    border-top: 0.5px solid #ddd;
+    padding-top: 1px;
   }
 }

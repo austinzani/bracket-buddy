@@ -38,7 +38,7 @@ describe('BracketTree', () => {
 
   it('renders Final Four and Championship labels', () => {
     render(<BracketTree teams={teams} picks={{}} />)
-    expect(screen.getByText('Final Four')).toBeDefined()
+    expect(screen.getAllByText('Final Four').length).toBe(2) // top and bottom
     expect(screen.getByText('Championship')).toBeDefined()
   })
 
@@ -65,18 +65,20 @@ describe('BracketTree', () => {
   it('shows winners when picks are provided', () => {
     const picks = {
       'East-R1-G1': 'east-1', // East 1 seed beats 16 seed
+      'East-R1-G2': 'east-9', // East 9 seed beats 8 seed
+      'East-R2-G1': 'east-1', // East 1 seed advances in R2
     }
     render(<BracketTree teams={teams} picks={picks} />)
-    // The winner should appear in R2 slot
-    // At minimum, east-1 should be visible in multiple places
+    // E1 appears in R1 matchup + as R2 winner output slot
     const e1Slots = screen.getAllByText('E1')
-    expect(e1Slots.length).toBeGreaterThanOrEqual(2) // R1 + R2
+    expect(e1Slots.length).toBeGreaterThanOrEqual(2)
   })
 
-  it('renders empty bracket structure when no teams provided', () => {
+  it('renders bracket structure even with no teams', () => {
     render(<BracketTree teams={[]} picks={{}} />)
-    // Still renders region labels even without teams
+    // Region labels still render, center column still renders
     expect(screen.getByText('East')).toBeDefined()
+    expect(screen.getByText('Champion TBD')).toBeDefined()
   })
 
   it('shows champion name in champion slot when Championship is picked', () => {
