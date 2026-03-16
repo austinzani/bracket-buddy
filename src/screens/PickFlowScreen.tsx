@@ -14,6 +14,8 @@ import { Layout } from '../components/Layout'
 import { Button } from '../components/Button'
 import { MatchupView } from '../components/MatchupView'
 import { PickProgress } from '../components/PickProgress'
+import { LoadingState } from '../components/LoadingState'
+import { ErrorState } from '../components/ErrorState'
 
 export function PickFlowScreen() {
   const { id } = useParams<{ id: string }>()
@@ -104,24 +106,17 @@ export function PickFlowScreen() {
 
   // Loading / error states
   if (teamsLoading) {
-    return (
-      <Layout>
-        <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-          <p style={{ fontSize: '2rem' }}>🏀</p>
-          <p style={{ color: 'var(--color-text-muted)' }}>Loading teams...</p>
-        </div>
-      </Layout>
-    )
+    return <Layout><LoadingState message="Loading teams..." /></Layout>
   }
 
   if (teamsError) {
     return (
       <Layout>
-        <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-          <p style={{ fontSize: '2rem' }}>😕</p>
-          <p style={{ color: 'var(--color-danger)' }}>Failed to load teams: {teamsError}</p>
-          <Button onClick={() => navigate('/')} style={{ marginTop: '1rem' }}>Back to Home</Button>
-        </div>
+        <ErrorState
+          message={`Failed to load teams: ${teamsError}`}
+          onRetry={() => navigate('/')}
+          retryLabel="Back to Home"
+        />
       </Layout>
     )
   }
@@ -129,24 +124,18 @@ export function PickFlowScreen() {
   if (!bracket) {
     return (
       <Layout>
-        <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-          <p style={{ fontSize: '2rem' }}>🤔</p>
-          <p>Bracket not found</p>
-          <Button onClick={() => navigate('/')} style={{ marginTop: '1rem' }}>Back to Home</Button>
-        </div>
+        <ErrorState
+          title="Not Found"
+          message="Bracket not found"
+          onRetry={() => navigate('/')}
+          retryLabel="Back to Home"
+        />
       </Layout>
     )
   }
 
   if (currentIndex === null || gameOrder.length === 0) {
-    return (
-      <Layout>
-        <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-          <p style={{ fontSize: '2rem' }}>🏀</p>
-          <p style={{ color: 'var(--color-text-muted)' }}>Setting up bracket...</p>
-        </div>
-      </Layout>
-    )
+    return <Layout><LoadingState message="Setting up bracket..." /></Layout>
   }
 
   const gameId = gameOrder[currentIndex]

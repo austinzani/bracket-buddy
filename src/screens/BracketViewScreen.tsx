@@ -8,6 +8,8 @@ import { Layout } from '../components/Layout'
 import { Button } from '../components/Button'
 import { BracketTree } from '../components/BracketTree'
 import { ChampionBanner } from '../components/ChampionBanner'
+import { LoadingState } from '../components/LoadingState'
+import { ErrorState } from '../components/ErrorState'
 
 export function BracketViewScreen() {
   const { id } = useParams<{ id: string }>()
@@ -19,24 +21,17 @@ export function BracketViewScreen() {
   const bracket = getBracket(id ?? '')
 
   if (teamsLoading) {
-    return (
-      <Layout>
-        <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-          <p style={{ fontSize: '2rem' }}>🏀</p>
-          <p style={{ color: 'var(--color-text-muted)' }}>Loading...</p>
-        </div>
-      </Layout>
-    )
+    return <Layout><LoadingState /></Layout>
   }
 
   if (teamsError) {
     return (
       <Layout>
-        <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-          <p style={{ fontSize: '2rem' }}>😕</p>
-          <p style={{ color: 'var(--color-danger)' }}>Failed to load teams: {teamsError}</p>
-          <Button onClick={() => navigate('/')} style={{ marginTop: '1rem' }}>Back to Home</Button>
-        </div>
+        <ErrorState
+          message={`Failed to load teams: ${teamsError}`}
+          onRetry={() => navigate('/')}
+          retryLabel="Back to Home"
+        />
       </Layout>
     )
   }
@@ -44,11 +39,12 @@ export function BracketViewScreen() {
   if (!bracket) {
     return (
       <Layout>
-        <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-          <p style={{ fontSize: '2rem' }}>🤔</p>
-          <p>Bracket not found</p>
-          <Button onClick={() => navigate('/')} style={{ marginTop: '1rem' }}>Back to Home</Button>
-        </div>
+        <ErrorState
+          title="Not Found"
+          message="Bracket not found"
+          onRetry={() => navigate('/')}
+          retryLabel="Back to Home"
+        />
       </Layout>
     )
   }
