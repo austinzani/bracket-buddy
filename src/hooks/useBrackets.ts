@@ -62,6 +62,21 @@ export function useBrackets() {
     [brackets, persist],
   )
 
+  const importBracket = useCallback(
+    (name: string, picks: Record<GameId, string>): Bracket => {
+      const bracket: Bracket = {
+        bracketId: crypto.randomUUID(),
+        name,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        picks,
+      }
+      persist([...brackets, bracket])
+      return bracket
+    },
+    [brackets, persist],
+  )
+
   const deleteBracket = useCallback(
     (bracketId: string): void => {
       persist(brackets.filter((b) => b.bracketId !== bracketId))
@@ -117,6 +132,7 @@ export function useBrackets() {
     brackets,
     storageError,
     createBracket,
+    importBracket,
     deleteBracket,
     getBracket,
     updatePick,

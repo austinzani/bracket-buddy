@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useBrackets } from '../hooks/useBrackets'
 import { useTeams } from '../hooks/useTeams'
 import { getBracketProgress } from '../data/bracket'
 import { getTeamById } from '../data/teams'
+import { encodeBracket } from '../data/shareCode'
 import { Layout } from '../components/Layout'
 import { Button } from '../components/Button'
 import { BracketTree } from '../components/BracketTree'
@@ -15,6 +17,7 @@ export function BracketViewScreen() {
   const navigate = useNavigate()
   const { getBracket } = useBrackets()
   const { teams, loading: teamsLoading, error: teamsError } = useTeams()
+  const [shareLabel, setShareLabel] = useState('Share Bracket')
 
   const bracket = getBracket(id ?? '')
 
@@ -54,6 +57,35 @@ export function BracketViewScreen() {
 
   const handleEdit = () => {
     navigate(`/bracket/${bracket.bracketId}`)
+  }
+
+  const handleShare = async () => {
+    const code = encodeBracket(bracket.name, bracket.picks)
+    const shareUrl = `${window.location.origin}/share?d=${code}`
+
+    // Use native share sheet on mobile if available
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: bracket.name,
+          text: `Check out my bracket: ${bracket.name}`,
+          url: shareUrl,
+        })
+        return
+      } catch {
+        // User cancelled or share failed — fall through to clipboard
+      }
+    }
+
+    // Fallback: copy to clipboard
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setShareLabel('Link Copied!')
+      setTimeout(() => setShareLabel('Share Bracket'), 2000)
+    } catch {
+      // Last resort: prompt
+      window.prompt('Copy this share link:', shareUrl)
+    }
   }
 
   const printDate = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
@@ -116,6 +148,10 @@ export function BracketViewScreen() {
           }, 500)
         }}>
           Print Bracket
+        </Button>
+
+        <Button variant="secondary" onClick={handleShare}>
+          {shareLabel}
         </Button>
 
         <Button variant="secondary" onClick={() => navigate('/new')}>
