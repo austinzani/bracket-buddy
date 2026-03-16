@@ -21,9 +21,11 @@ const LINE_W = 1.5
 
 /**
  * Recursive component: renders one game as a traditional bracket.
- * - For R1 games: two BracketSlots stacked vertically
- * - For later rounds: two child BracketGame subtrees connected by bracket lines,
- *   with the winner BracketSlot at the output.
+ * Every game (including R1) renders:
+ *   [two inputs] → [connector lines] → [winner slot]
+ *
+ * For R1: inputs are plain team BracketSlots.
+ * For R2+: inputs are recursive BracketGame subtrees.
  */
 function BracketGame({
   gameId,
@@ -42,34 +44,51 @@ function BracketGame({
   if (!game) return null
 
   const winnerId = picks[gameId]
+  const winnerTeam = winnerId ? getTeamById(teams, winnerId) : undefined
+
+  // Build the two input elements
+  let inputA: React.ReactNode
+  let inputB: React.ReactNode
 
   if (game.isFirstRound) {
-    // R1: just two team slots stacked
+    // R1: inputs are simple team slots
     const teamA = game.sourceA ? getTeamById(teams, game.sourceA) : undefined
     const teamB = game.sourceB ? getTeamById(teams, game.sourceB) : undefined
-    return (
-      <div data-matchup="" style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        gap: SLOT_GAP,
-      }}>
-        <BracketSlot
-          team={teamA ?? null}
-          isWinner={winnerId !== undefined && winnerId === game.sourceA}
-          compact
-        />
-        <BracketSlot
-          team={teamB ?? null}
-          isWinner={winnerId !== undefined && winnerId === game.sourceB}
-          compact
-        />
-      </div>
+    inputA = (
+      <BracketSlot
+        team={teamA ?? null}
+        isWinner={winnerId !== undefined && winnerId === game.sourceA}
+        compact
+      />
+    )
+    inputB = (
+      <BracketSlot
+        team={teamB ?? null}
+        isWinner={winnerId !== undefined && winnerId === game.sourceB}
+        compact
+      />
+    )
+  } else {
+    // R2+: inputs are recursive subtrees
+    inputA = (
+      <BracketGame
+        gameId={game.sourceA}
+        games={games}
+        picks={picks}
+        teams={teams}
+        reverse={reverse}
+      />
+    )
+    inputB = (
+      <BracketGame
+        gameId={game.sourceB}
+        games={games}
+        picks={picks}
+        teams={teams}
+        reverse={reverse}
+      />
     )
   }
-
-  // R2+: recurse into source games, draw connector, show winner slot
-  const winnerTeam = winnerId ? getTeamById(teams, winnerId) : undefined
 
   return (
     <div style={{
@@ -77,30 +96,18 @@ function BracketGame({
       flexDirection: reverse ? 'row-reverse' : 'row',
       alignItems: 'center',
     }}>
-      {/* Two source subtrees stacked vertically */}
+      {/* Two inputs stacked vertically */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         gap: SLOT_GAP,
       }}>
-        <BracketGame
-          gameId={game.sourceA}
-          games={games}
-          picks={picks}
-          teams={teams}
-          reverse={reverse}
-        />
-        <BracketGame
-          gameId={game.sourceB}
-          games={games}
-          picks={picks}
-          teams={teams}
-          reverse={reverse}
-        />
+        {inputA}
+        {inputB}
       </div>
 
-      {/* Bracket connector lines */}
+      {/* Bracket connector lines: "]" or "[" shape */}
       <BracketConnector reverse={reverse} />
 
       {/* Winner slot at the output */}
