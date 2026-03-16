@@ -6,6 +6,7 @@ interface TeamCardProps {
   selected?: boolean
   onClick?: () => void
   size?: 'normal' | 'large'
+  horizontal?: boolean
 }
 
 function getContrastColor(hex: string): string {
@@ -16,7 +17,7 @@ function getContrastColor(hex: string): string {
   return luminance > 0.5 ? '#1a1a1a' : '#ffffff'
 }
 
-export function TeamCard({ team, selected = false, onClick, size = 'normal' }: TeamCardProps) {
+export function TeamCard({ team, selected = false, onClick, size = 'normal', horizontal = false }: TeamCardProps) {
   const [mascotError, setMascotError] = useState(false)
   const [costumeError, setCostumeError] = useState(false)
 
@@ -60,7 +61,8 @@ export function TeamCard({ team, selected = false, onClick, size = 'normal' }: T
     justifyContent: 'center',
     minHeight: 0,
     minWidth: 0,
-    width: '100%',
+    width: horizontal ? undefined : '100%',
+    height: horizontal ? '100%' : undefined,
     overflow: 'hidden',
   }
 
@@ -141,18 +143,18 @@ export function TeamCard({ team, selected = false, onClick, size = 'normal' }: T
         </div>
       )}
 
-      {/* Images stacked vertically, equal space */}
+      {/* Images: vertical by default, horizontal on mobile */}
       <div style={{
         flex: 1,
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: horizontal ? 'row' : 'column',
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
         minHeight: 0,
         padding: isLarge ? '12px 16px' : '8px 12px',
         boxSizing: 'border-box',
-        gap: isLarge ? 8 : 4,
+        gap: horizontal ? 12 : (isLarge ? 8 : 4),
       }}>
         {/* Mascot / logo image */}
         <div style={imageSlotStyle}>

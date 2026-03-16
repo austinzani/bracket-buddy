@@ -223,7 +223,7 @@ export function PickFlowScreen() {
         bracketName={bracket.name}
         currentGame={game}
         currentIndex={currentIndex}
-        totalGames={63}
+        totalGames={gameOrder.length}
         picksMade={getBracketProgress(bracket.picks).made}
       />
 
