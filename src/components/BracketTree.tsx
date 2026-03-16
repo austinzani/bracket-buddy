@@ -249,7 +249,7 @@ function BracketGame({
       alignItems: 'center',
     }}>
       {/* Two inputs stacked vertically */}
-      <div style={{
+      <div data-bracket-inputs="" style={{
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',

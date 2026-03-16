@@ -37,7 +37,7 @@
   html, body, #root {
     height: 100% !important;
     min-height: 100% !important;
-    overflow: visible !important;
+    overflow: hidden !important;
     margin: 0 !important;
     padding: 0 !important;
   }
@@ -52,6 +52,7 @@
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
+    overflow: hidden !important;
   }
 
   /* Hide UI chrome */
@@ -70,7 +71,7 @@
     left: 50% !important;
     transform: translateX(-50%) !important;
     text-align: center;
-    font-size: 10px !important;
+    font-size: 9px !important;
     font-weight: 800;
     margin: 0 !important;
     padding: 0 !important;
@@ -88,9 +89,16 @@
     display: none !important;
   }
 
-  /* === BRACKET TREE === */
+  /* === PAGE WRAPPER: kill padding and min-height === */
+  [data-bracket-page] {
+    padding: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* === BRACKET TREE: clip to prevent SVG bleed to next page === */
   [data-bracket-tree] {
-    overflow: visible !important;
+    overflow: hidden !important;
     width: 100% !important;
   }
 
@@ -99,12 +107,12 @@
     gap: 2px !important;
     padding: 0 !important;
     justify-content: center !important;
-    overflow: visible !important;
+    overflow: hidden !important;
   }
 
   /* Each side (left/right stack of 2 regions) */
   [data-bracket-side] {
-    gap: 6px !important;
+    gap: 4px !important;
   }
 
   /* Region (horizontal row of round columns) */
@@ -117,23 +125,28 @@
     gap: 1px !important;
   }
 
+  /* Input pairs (two teams feeding into a game) */
+  [data-bracket-inputs] {
+    gap: 2px !important;
+  }
+
   /* Region / Final Four / Championship labels */
   [data-bracket-label] {
-    font-size: 7px !important;
-    margin-bottom: 2px !important;
+    font-size: 6.5px !important;
+    margin-bottom: 1px !important;
     letter-spacing: 0.5px !important;
   }
 
-  /* === BRACKET SLOTS: sized to fill page === */
+  /* === BRACKET SLOTS: compact to fit single page with browser chrome === */
   [data-bracket-slot] {
-    height: 16px !important;
-    min-height: 16px !important;
-    max-height: 16px !important;
+    height: 15px !important;
+    min-height: 15px !important;
+    max-height: 15px !important;
     min-width: 70px !important;
-    max-width: 95px !important;
+    max-width: 92px !important;
     padding: 1px 3px !important;
     font-size: 7px !important;
-    gap: 3px !important;
+    gap: 2px !important;
     border-radius: 2px !important;
     border-width: 0.5px !important;
     background-color: #ffffff !important;
@@ -166,8 +179,8 @@
 
   /* SVG connector columns */
   [data-connector] {
-    width: 16px !important;
-    min-width: 16px !important;
+    width: 14px !important;
+    min-width: 14px !important;
   }
 
   [data-connector] svg {
@@ -175,20 +188,20 @@
   }
 
   [data-connector] path {
-    stroke-width: 0.75px !important;
+    stroke-width: 0.65px !important;
   }
 
   /* Center column */
   [data-center-column] {
-    min-width: 75px !important;
-    gap: 6px !important;
-    padding: 0 4px !important;
+    min-width: 70px !important;
+    gap: 4px !important;
+    padding: 0 3px !important;
   }
 
   /* Champion slot in center */
   [data-champion-slot] {
-    font-size: 8px !important;
-    padding: 3px 6px !important;
+    font-size: 7px !important;
+    padding: 2px 5px !important;
     border-radius: 2px !important;
     border-width: 1px !important;
     box-shadow: none !important;
@@ -217,7 +230,7 @@
  * Duplicates the sizing rules that affect bracket layout.
  */
 .print-mode [data-bracket-tree] {
-  overflow: visible !important;
+  overflow: hidden !important;
   width: 100% !important;
 }
 
@@ -227,18 +240,22 @@
 }
 
 .print-mode [data-bracket-side] {
-  gap: 6px !important;
+  gap: 4px !important;
+}
+
+.print-mode [data-bracket-inputs] {
+  gap: 2px !important;
 }
 
 .print-mode [data-bracket-slot] {
-  height: 16px !important;
-  min-height: 16px !important;
-  max-height: 16px !important;
+  height: 15px !important;
+  min-height: 15px !important;
+  max-height: 15px !important;
   min-width: 70px !important;
-  max-width: 95px !important;
+  max-width: 92px !important;
   padding: 1px 3px !important;
   font-size: 7px !important;
-  gap: 3px !important;
+  gap: 2px !important;
   border-radius: 2px !important;
   border-width: 0.5px !important;
   line-height: 1 !important;
@@ -256,30 +273,30 @@
 }
 
 .print-mode [data-connector] {
-  width: 16px !important;
-  min-width: 16px !important;
+  width: 14px !important;
+  min-width: 14px !important;
 }
 
 .print-mode [data-connector] path {
-  stroke-width: 0.75px !important;
+  stroke-width: 0.65px !important;
 }
 
 .print-mode [data-center-column] {
-  min-width: 75px !important;
-  gap: 6px !important;
-  padding: 0 4px !important;
+  min-width: 70px !important;
+  gap: 4px !important;
+  padding: 0 3px !important;
 }
 
 .print-mode [data-champion-slot] {
-  font-size: 8px !important;
-  padding: 3px 6px !important;
+  font-size: 7px !important;
+  padding: 2px 5px !important;
   border-radius: 2px !important;
   border-width: 1px !important;
   box-shadow: none !important;
 }
 
 .print-mode [data-bracket-label] {
-  font-size: 7px !important;
-  margin-bottom: 2px !important;
+  font-size: 6.5px !important;
+  margin-bottom: 1px !important;
   letter-spacing: 0.5px !important;
 }

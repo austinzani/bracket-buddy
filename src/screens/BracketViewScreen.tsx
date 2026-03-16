@@ -59,7 +59,7 @@ export function BracketViewScreen() {
   const printDate = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 
   return (
-    <div style={{ padding: '1rem', minHeight: '100vh' }}>
+    <div data-bracket-page="" style={{ padding: '1rem', minHeight: '100vh' }}>
       {/* Print-only title (includes champion if complete) */}
       <div data-print-title="" style={{ display: 'none' }}>
         {bracket.name}{isComplete && champion ? ` — 🏆 #${champion.seed} ${champion.name}` : ''}
