@@ -35,18 +35,23 @@
   }
 
   html, body, #root {
-    height: auto !important;
-    min-height: auto !important;
+    height: 100% !important;
+    min-height: 100% !important;
     overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
-  /* Page wrapper becomes relative positioning context */
+  /* Page wrapper: fill the page and center content vertically */
   #root > div {
     max-width: none !important;
     padding: 0 !important;
-    min-height: auto !important;
-    height: auto !important;
+    min-height: 100% !important;
+    height: 100% !important;
     position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
   }
 
   /* Hide UI chrome */
