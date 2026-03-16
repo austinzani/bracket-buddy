@@ -9,19 +9,47 @@ const SEED_MATCHUPS: [number, number][] = [
 ]
 
 /**
- * Generate all 63 games for the tournament bracket.
+ * Generate all 67 games for the tournament bracket (4 play-in + 63 main).
  * Returns a map of gameId -> Game.
  */
 export function generateBracketGames(teams: Team[]): Map<GameId, Game> {
   const games = new Map<GameId, Game>()
-  const teamsByRegion = new Map<string, Map<number, Team>>()
 
-  // Index teams by region and seed
+  // Index non-play-in teams by region and seed
+  const teamsByRegion = new Map<string, Map<number, Team>>()
+  // Track play-in games: playInGameId -> [teamA, teamB]
+  const playInGroups = new Map<string, Team[]>()
+  // Track which region+seed slots are filled by play-in games
+  const playInSlots = new Map<string, string>() // "region-seed" -> playInGameId
+
   for (const team of teams) {
-    if (!teamsByRegion.has(team.region)) {
-      teamsByRegion.set(team.region, new Map())
+    if (team.playInGameId) {
+      // Group play-in teams by their game ID
+      if (!playInGroups.has(team.playInGameId)) {
+        playInGroups.set(team.playInGameId, [])
+      }
+      playInGroups.get(team.playInGameId)!.push(team)
+      playInSlots.set(`${team.region}-${team.seed}`, team.playInGameId)
+    } else {
+      if (!teamsByRegion.has(team.region)) {
+        teamsByRegion.set(team.region, new Map())
+      }
+      teamsByRegion.get(team.region)!.set(team.seed, team)
     }
-    teamsByRegion.get(team.region)!.set(team.seed, team)
+  }
+
+  // Generate play-in games (round 0)
+  for (const [playInGameId, playInTeams] of playInGroups) {
+    if (playInTeams.length === 2) {
+      games.set(playInGameId, {
+        gameId: playInGameId,
+        round: 0,
+        region: playInTeams[0].region,
+        sourceA: playInTeams[0].id,
+        sourceB: playInTeams[1].id,
+        isFirstRound: true,
+      })
+    }
   }
 
   for (const region of REGIONS) {
@@ -29,18 +57,27 @@ export function generateBracketGames(teams: Team[]): Map<GameId, Game> {
     if (!regionTeams) continue
 
     // Round 1: 8 games per region
+    // Some seeds may be filled by play-in game winners instead of direct teams
     for (let g = 0; g < SEED_MATCHUPS.length; g++) {
       const [seedA, seedB] = SEED_MATCHUPS[g]
-      const teamA = regionTeams.get(seedA)
-      const teamB = regionTeams.get(seedB)
       const gameId = `${region}-R1-G${g + 1}`
+
+      const playInA = playInSlots.get(`${region}-${seedA}`)
+      const playInB = playInSlots.get(`${region}-${seedB}`)
+
+      // If a seed has a play-in, reference the play-in game ID; otherwise use team ID directly
+      const sourceA = playInA ?? (regionTeams.get(seedA)?.id ?? '')
+      const sourceB = playInB ?? (regionTeams.get(seedB)?.id ?? '')
+      // isFirstRound means both sources are team IDs (no prerequisite games)
+      const isFirstRound = !playInA && !playInB
+
       games.set(gameId, {
         gameId,
         round: 1,
         region,
-        sourceA: teamA?.id ?? '',
-        sourceB: teamB?.id ?? '',
-        isFirstRound: true,
+        sourceA,
+        sourceB,
+        isFirstRound,
       })
     }
 
@@ -113,9 +150,30 @@ export function getGameParticipants(
     return [game.sourceA || null, game.sourceB || null]
   }
 
-  const teamA = picks[game.sourceA] ?? null
-  const teamB = picks[game.sourceB] ?? null
+  // For non-first-round games, each source is a prerequisite game ID.
+  // Look up the winner of that game from picks.
+  const teamA = resolveSource(game.sourceA, games, picks)
+  const teamB = resolveSource(game.sourceB, games, picks)
   return [teamA, teamB]
+}
+
+/**
+ * Resolve a game source to a team ID.
+ * If the source is a game ID (exists in games map), look up the winner from picks.
+ * Otherwise treat it as a direct team ID.
+ */
+function resolveSource(
+  source: string,
+  games: Map<GameId, Game>,
+  picks: Record<GameId, string>,
+): string | null {
+  if (!source) return null
+  if (games.has(source)) {
+    // It's a game ID — look up the winner
+    return picks[source] ?? null
+  }
+  // It's a direct team ID
+  return source
 }
 
 /**
@@ -166,10 +224,12 @@ export function getNextUnpickedGameIndex(
 }
 
 /**
- * Compute bracket progress: how many of 63 picks have been made.
+ * Compute bracket progress: how many picks have been made out of total games.
+ * Total is 67 with play-in games (4 play-in + 63 main bracket).
  */
-export function getBracketProgress(picks: Record<GameId, string>): { made: number; total: number } {
-  return { made: Object.keys(picks).length, total: 63 }
+export function getBracketProgress(picks: Record<GameId, string>, games?: Map<GameId, Game>): { made: number; total: number } {
+  const total = games ? games.size : 67
+  return { made: Object.keys(picks).length, total }
 }
 
 /**
