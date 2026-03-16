@@ -9,6 +9,7 @@ import {
   invalidateDownstreamPicks,
 } from './bracket'
 
+/** Creates 64 teams (no play-ins) — produces a 63-game bracket */
 function makeSampleTeams(): Team[] {
   const regions = ['East', 'West', 'South', 'Midwest'] as const
   const teams: Team[] = []
@@ -31,7 +32,71 @@ function makeSampleTeams(): Team[] {
   return teams
 }
 
-describe('generateBracketGames', () => {
+/** Creates 68 teams (4 play-in pairs) — produces a 67-game bracket */
+function makeSampleTeamsWithPlayIns(): Team[] {
+  const regions = ['East', 'West', 'South', 'Midwest'] as const
+  const teams: Team[] = []
+
+  // Play-in config: region, seed, playInGameId
+  const playIns: { region: typeof regions[number]; seed: number; gameId: string }[] = [
+    { region: 'West', seed: 11, gameId: 'PlayIn-G1' },
+    { region: 'South', seed: 16, gameId: 'PlayIn-G2' },
+    { region: 'Midwest', seed: 11, gameId: 'PlayIn-G3' },
+    { region: 'Midwest', seed: 16, gameId: 'PlayIn-G4' },
+  ]
+
+  for (const region of regions) {
+    for (let seed = 1; seed <= 16; seed++) {
+      const playIn = playIns.find((p) => p.region === region && p.seed === seed)
+
+      if (playIn) {
+        // Add two teams for this play-in slot
+        teams.push({
+          id: `${region.toLowerCase()}-${seed}a`,
+          name: `${region} Team ${seed}A`,
+          shortName: `${region[0]}${seed}A`,
+          seed,
+          region,
+          primaryColor: '#000000',
+          secondaryColor: '#FFFFFF',
+          jerseyImage: '',
+          mascotImage: '',
+          mascotCostumeImage: '',
+          playInGameId: playIn.gameId,
+        })
+        teams.push({
+          id: `${region.toLowerCase()}-${seed}b`,
+          name: `${region} Team ${seed}B`,
+          shortName: `${region[0]}${seed}B`,
+          seed,
+          region,
+          primaryColor: '#000000',
+          secondaryColor: '#FFFFFF',
+          jerseyImage: '',
+          mascotImage: '',
+          mascotCostumeImage: '',
+          playInGameId: playIn.gameId,
+        })
+      } else {
+        teams.push({
+          id: `${region.toLowerCase()}-${seed}`,
+          name: `${region} Team ${seed}`,
+          shortName: `${region[0]}${seed}`,
+          seed,
+          region,
+          primaryColor: '#000000',
+          secondaryColor: '#FFFFFF',
+          jerseyImage: '',
+          mascotImage: '',
+          mascotCostumeImage: '',
+        })
+      }
+    }
+  }
+  return teams
+}
+
+describe('generateBracketGames (no play-ins)', () => {
   const teams = makeSampleTeams()
   const games = generateBracketGames(teams)
 
@@ -44,29 +109,12 @@ describe('generateBracketGames', () => {
     expect(r1.length).toBe(32)
   })
 
-  it('generates 16 round 2 games', () => {
-    const r2 = Array.from(games.values()).filter((g) => g.round === 2)
-    expect(r2.length).toBe(16)
-  })
-
-  it('generates 8 Sweet 16 games', () => {
-    const r3 = Array.from(games.values()).filter((g) => g.round === 3)
-    expect(r3.length).toBe(8)
-  })
-
-  it('generates 4 Elite 8 games', () => {
-    const r4 = Array.from(games.values()).filter((g) => g.round === 4)
-    expect(r4.length).toBe(4)
-  })
-
-  it('generates 2 Final Four games', () => {
-    const r5 = Array.from(games.values()).filter((g) => g.round === 5)
-    expect(r5.length).toBe(2)
-  })
-
-  it('generates 1 Championship game', () => {
-    const r6 = Array.from(games.values()).filter((g) => g.round === 6)
-    expect(r6.length).toBe(1)
+  it('generates correct round counts', () => {
+    expect(Array.from(games.values()).filter((g) => g.round === 2).length).toBe(16)
+    expect(Array.from(games.values()).filter((g) => g.round === 3).length).toBe(8)
+    expect(Array.from(games.values()).filter((g) => g.round === 4).length).toBe(4)
+    expect(Array.from(games.values()).filter((g) => g.round === 5).length).toBe(2)
+    expect(Array.from(games.values()).filter((g) => g.round === 6).length).toBe(1)
   })
 
   it('round 1 matchups follow standard seed pairing', () => {
@@ -96,6 +144,47 @@ describe('generateBracketGames', () => {
   })
 })
 
+describe('generateBracketGames (with play-ins)', () => {
+  const teams = makeSampleTeamsWithPlayIns()
+  const games = generateBracketGames(teams)
+
+  it('generates 67 total games (4 play-in + 63 main)', () => {
+    expect(games.size).toBe(67)
+  })
+
+  it('generates 4 play-in games (round 0)', () => {
+    const r0 = Array.from(games.values()).filter((g) => g.round === 0)
+    expect(r0.length).toBe(4)
+  })
+
+  it('play-in games have team IDs as sources', () => {
+    const pi1 = games.get('PlayIn-G1')!
+    expect(pi1.isFirstRound).toBe(true)
+    expect(pi1.sourceA).toBe('west-11a')
+    expect(pi1.sourceB).toBe('west-11b')
+  })
+
+  it('R1 games at play-in seeds reference the play-in game ID', () => {
+    // West seed 11 is in SEED_MATCHUPS as [6,11] which is game 5
+    const westG5 = games.get('West-R1-G5')!
+    expect(westG5.sourceA).toBe('west-6') // seed 6 is a direct team
+    expect(westG5.sourceB).toBe('PlayIn-G1') // seed 11 is a play-in game
+    expect(westG5.isFirstRound).toBe(false) // has a play-in prerequisite
+  })
+
+  it('R1 games without play-in seeds remain isFirstRound', () => {
+    const eastG1 = games.get('East-R1-G1')!
+    expect(eastG1.isFirstRound).toBe(true)
+    expect(eastG1.sourceA).toBe('east-1')
+    expect(eastG1.sourceB).toBe('east-16')
+  })
+
+  it('still generates 32 R1 games', () => {
+    const r1 = Array.from(games.values()).filter((g) => g.round === 1)
+    expect(r1.length).toBe(32)
+  })
+})
+
 describe('getGameParticipants', () => {
   const teams = makeSampleTeams()
   const games = generateBracketGames(teams)
@@ -120,24 +209,58 @@ describe('getGameParticipants', () => {
   })
 })
 
-describe('getRoundByRoundOrder', () => {
-  const teams = makeSampleTeams()
+describe('getGameParticipants (with play-ins)', () => {
+  const teams = makeSampleTeamsWithPlayIns()
   const games = generateBracketGames(teams)
-  const order = getRoundByRoundOrder(games)
 
-  it('returns 63 games in order', () => {
+  it('returns team IDs for play-in games', () => {
+    const [a, b] = getGameParticipants('PlayIn-G1', games, {})
+    expect(a).toBe('west-11a')
+    expect(b).toBe('west-11b')
+  })
+
+  it('returns null for R1 game when play-in not yet picked', () => {
+    // West-R1-G5 is [6, 11] — seed 6 is direct, seed 11 is play-in
+    const [a, b] = getGameParticipants('West-R1-G5', games, {})
+    expect(a).toBe('west-6') // direct team ID via resolveSource
+    expect(b).toBeNull() // play-in not picked yet
+  })
+
+  it('resolves R1 game after play-in is picked', () => {
+    const picks = { 'PlayIn-G1': 'west-11a' }
+    const [a, b] = getGameParticipants('West-R1-G5', games, picks)
+    expect(a).toBe('west-6')
+    expect(b).toBe('west-11a')
+  })
+})
+
+describe('getRoundByRoundOrder', () => {
+  it('returns 63 games in order (no play-ins)', () => {
+    const teams = makeSampleTeams()
+    const games = generateBracketGames(teams)
+    const order = getRoundByRoundOrder(games)
     expect(order.length).toBe(63)
-  })
-
-  it('starts with round 1 games', () => {
     expect(order[0]).toMatch(/R1/)
+    expect(order[order.length - 1]).toBe('Championship')
   })
 
-  it('ends with Championship', () => {
+  it('returns 67 games with play-ins first', () => {
+    const teams = makeSampleTeamsWithPlayIns()
+    const games = generateBracketGames(teams)
+    const order = getRoundByRoundOrder(games)
+    expect(order.length).toBe(67)
+    // Play-in games (round 0) come first
+    expect(order[0]).toMatch(/PlayIn/)
+    expect(order[3]).toMatch(/PlayIn/)
+    // Then R1 starts
+    expect(order[4]).toMatch(/R1/)
     expect(order[order.length - 1]).toBe('Championship')
   })
 
   it('all round 1 games come before all round 2 games', () => {
+    const teams = makeSampleTeams()
+    const games = generateBracketGames(teams)
+    const order = getRoundByRoundOrder(games)
     const lastR1 = Math.max(...order.map((id, i) => (id.includes('R1') ? i : -1)))
     const firstR2 = order.findIndex((id) => id.includes('R2'))
     expect(lastR1).toBeLessThan(firstR2)
@@ -145,13 +268,19 @@ describe('getRoundByRoundOrder', () => {
 })
 
 describe('getBracketProgress', () => {
-  it('returns 0 of 63 for empty picks', () => {
-    expect(getBracketProgress({})).toEqual({ made: 0, total: 63 })
+  it('returns 0 of 67 for empty picks (default)', () => {
+    expect(getBracketProgress({})).toEqual({ made: 0, total: 67 })
   })
 
   it('counts picks correctly', () => {
     const picks = { 'East-R1-G1': 'east-1', 'East-R1-G2': 'east-9' }
-    expect(getBracketProgress(picks)).toEqual({ made: 2, total: 63 })
+    expect(getBracketProgress(picks)).toEqual({ made: 2, total: 67 })
+  })
+
+  it('uses games map size when provided', () => {
+    const teams = makeSampleTeams()
+    const games = generateBracketGames(teams)
+    expect(getBracketProgress({}, games)).toEqual({ made: 0, total: 63 })
   })
 })
 
@@ -170,7 +299,6 @@ describe('getNextUnpickedGameIndex', () => {
   })
 
   it('returns order length when all picks are made', () => {
-    // Make all 63 picks (just fill with dummy values to count)
     const picks: Record<string, string> = {}
     for (const gameId of order) {
       picks[gameId] = 'some-team'
@@ -219,5 +347,27 @@ describe('invalidateDownstreamPicks', () => {
 
     expect(invalidated).toEqual([])
     expect(updatedPicks['East-R2-G1']).toBe('east-9')
+  })
+})
+
+describe('invalidateDownstreamPicks (with play-ins)', () => {
+  const teams = makeSampleTeamsWithPlayIns()
+  const games = generateBracketGames(teams)
+
+  it('invalidates R1 pick when play-in pick changes', () => {
+    const picks = {
+      'PlayIn-G1': 'west-11a',
+      'West-R1-G5': 'west-11a', // picked the play-in winner to advance past R1
+    }
+
+    const { updatedPicks, invalidated } = invalidateDownstreamPicks(
+      'PlayIn-G1',
+      'west-11a',
+      games,
+      picks,
+    )
+
+    expect(invalidated).toContain('West-R1-G5')
+    expect(updatedPicks['West-R1-G5']).toBeUndefined()
   })
 })

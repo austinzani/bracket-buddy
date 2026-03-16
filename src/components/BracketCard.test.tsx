@@ -32,13 +32,13 @@ describe('BracketCard', () => {
 
   it('renders progress as 0 of 63 for empty bracket', () => {
     render(<BracketCard bracket={makeBracket()} {...defaultProps} />)
-    expect(screen.getByText('0 of 63 picks')).toBeDefined()
+    expect(screen.getByText('0 of 67 picks')).toBeDefined()
   })
 
   it('renders progress with pick count', () => {
     const picks = { 'East-R1-G1': 'duke', 'East-R1-G2': 'unc' }
     render(<BracketCard bracket={makeBracket({ picks })} {...defaultProps} />)
-    expect(screen.getByText('2 of 63 picks')).toBeDefined()
+    expect(screen.getByText('2 of 67 picks')).toBeDefined()
   })
 
   it('shows Continue button for incomplete brackets', () => {
@@ -49,14 +49,14 @@ describe('BracketCard', () => {
   it('shows View button for complete brackets', () => {
     // Create 63 picks
     const picks: Record<string, string> = {}
-    for (let i = 0; i < 63; i++) picks[`game-${i}`] = 'team'
+    for (let i = 0; i < 67; i++) picks[`game-${i}`] = 'team'
     render(<BracketCard bracket={makeBracket({ picks })} {...defaultProps} />)
     expect(screen.getByRole('button', { name: 'View' })).toBeDefined()
   })
 
   it('shows Complete badge for complete brackets', () => {
     const picks: Record<string, string> = {}
-    for (let i = 0; i < 63; i++) picks[`game-${i}`] = 'team'
+    for (let i = 0; i < 67; i++) picks[`game-${i}`] = 'team'
     render(<BracketCard bracket={makeBracket({ picks })} {...defaultProps} />)
     expect(screen.getByText('Complete')).toBeDefined()
   })
@@ -95,7 +95,7 @@ describe('BracketCard', () => {
 
   it('shows Edit button for complete brackets', () => {
     const picks: Record<string, string> = {}
-    for (let i = 0; i < 63; i++) picks[`game-${i}`] = 'team'
+    for (let i = 0; i < 67; i++) picks[`game-${i}`] = 'team'
     render(<BracketCard bracket={makeBracket({ picks })} {...defaultProps} />)
     expect(screen.getByRole('button', { name: 'Edit' })).toBeDefined()
   })
