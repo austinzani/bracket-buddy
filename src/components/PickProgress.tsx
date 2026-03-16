@@ -10,6 +10,7 @@ interface PickProgressProps {
 }
 
 const ROUND_NAMES: Record<number, string> = {
+  0: 'First Four',
   1: 'Round of 64',
   2: 'Round of 32',
   3: 'Sweet 16',
