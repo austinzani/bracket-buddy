@@ -18,9 +18,9 @@ const makeTeam = (overrides?: Partial<Team>): Team => ({
 })
 
 describe('TeamCard', () => {
-  it('renders team short name', () => {
+  it('renders team name', () => {
     render(<TeamCard team={makeTeam()} />)
-    expect(screen.getByText('Duke')).toBeDefined()
+    expect(screen.getByText('Duke Blue Devils')).toBeDefined()
   })
 
   it('renders seed badge', () => {

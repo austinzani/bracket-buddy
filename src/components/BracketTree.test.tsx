@@ -74,9 +74,9 @@ describe('BracketTree', () => {
     expect(e1Slots.length).toBeGreaterThanOrEqual(2)
   })
 
-  it('renders bracket structure even with no teams', () => {
+  it('renders bracket shell even with no teams', () => {
     render(<BracketTree teams={[]} picks={{}} />)
-    // Region labels still render, center column still renders
+    // Region labels and center column still render
     expect(screen.getByText('East')).toBeDefined()
     expect(screen.getByText('Champion TBD')).toBeDefined()
   })

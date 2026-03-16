@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { forwardRef, type CSSProperties } from 'react'
 import type { Team } from '../types'
 
 interface BracketSlotProps {
@@ -15,8 +15,8 @@ const slotStyle: CSSProperties = {
   fontSize: '0.75rem',
   fontWeight: 600,
   borderRadius: 4,
-  minWidth: 120,
-  maxWidth: 150,
+  minWidth: 130,
+  maxWidth: 170,
   height: 28,
   overflow: 'hidden',
   whiteSpace: 'nowrap',
@@ -32,59 +32,62 @@ const emptySlotStyle: CSSProperties = {
   fontStyle: 'italic',
 }
 
-export function BracketSlot({ team, isWinner = false, compact = false }: BracketSlotProps) {
-  if (!team) {
+export const BracketSlot = forwardRef<HTMLDivElement, BracketSlotProps>(
+  function BracketSlot({ team, isWinner = false, compact = false }, ref) {
+    if (!team) {
+      return (
+        <div ref={ref} data-bracket-slot="" style={emptySlotStyle}>
+          <span style={{ fontSize: '0.7rem' }}>TBD</span>
+        </div>
+      )
+    }
+
+    const bgColor = isWinner ? team.primaryColor : 'var(--color-card)'
+    const textColor = isWinner ? (team.secondaryColor || '#ffffff') : 'var(--color-text)'
+    const opacity = isWinner ? 1 : 0.7
+
     return (
-      <div data-bracket-slot="" style={emptySlotStyle}>
-        <span style={{ fontSize: '0.7rem' }}>TBD</span>
+      <div
+        ref={ref}
+        data-bracket-slot=""
+        data-winner={isWinner ? '' : undefined}
+        style={{
+          ...slotStyle,
+          backgroundColor: bgColor,
+          color: textColor,
+          opacity,
+          borderColor: isWinner ? team.primaryColor : 'var(--color-border)',
+          fontWeight: isWinner ? 800 : 600,
+        }}
+        title={team.name}
+      >
+        {!compact && team.mascotImage && (
+          <img
+            src={team.mascotImage}
+            alt=""
+            style={{
+              width: 18,
+              height: 18,
+              objectFit: 'contain',
+              flexShrink: 0,
+            }}
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+          />
+        )}
+        <span style={{
+          fontSize: '0.65rem',
+          opacity: 0.8,
+          flexShrink: 0,
+        }}>
+          {team.seed}
+        </span>
+        <span style={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}>
+          {team.shortName}
+        </span>
       </div>
     )
   }
-
-  const bgColor = isWinner ? team.primaryColor : 'var(--color-card)'
-  const textColor = isWinner ? (team.secondaryColor || '#ffffff') : 'var(--color-text)'
-  const opacity = isWinner ? 1 : 0.7
-
-  return (
-    <div
-      data-bracket-slot=""
-      data-winner={isWinner ? '' : undefined}
-      style={{
-        ...slotStyle,
-        backgroundColor: bgColor,
-        color: textColor,
-        opacity,
-        borderColor: isWinner ? team.primaryColor : 'var(--color-border)',
-        fontWeight: isWinner ? 800 : 600,
-      }}
-      title={team.name}
-    >
-      {!compact && team.mascotImage && (
-        <img
-          src={team.mascotImage}
-          alt=""
-          style={{
-            width: 18,
-            height: 18,
-            objectFit: 'contain',
-            flexShrink: 0,
-          }}
-          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-        />
-      )}
-      <span style={{
-        fontSize: '0.65rem',
-        opacity: 0.8,
-        flexShrink: 0,
-      }}>
-        {team.seed}
-      </span>
-      <span style={{
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-      }}>
-        {team.shortName}
-      </span>
-    </div>
-  )
-}
+)

@@ -13,7 +13,7 @@ import { ErrorState } from '../components/ErrorState'
 export function BracketViewScreen() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { getBracket, unlockBracket } = useBrackets()
+  const { getBracket } = useBrackets()
   const { teams, loading: teamsLoading, error: teamsError } = useTeams()
 
   const bracket = getBracket(id ?? '')
@@ -53,7 +53,6 @@ export function BracketViewScreen() {
   const champion = championId ? getTeamById(teams, championId) : undefined
 
   const handleEdit = () => {
-    unlockBracket(bracket.bracketId)
     navigate(`/bracket/${bracket.bracketId}`)
   }
 
@@ -61,9 +60,9 @@ export function BracketViewScreen() {
 
   return (
     <div style={{ padding: '1rem', minHeight: '100vh' }}>
-      {/* Print-only title */}
+      {/* Print-only title (includes champion if complete) */}
       <div data-print-title="" style={{ display: 'none' }}>
-        {bracket.name}
+        {bracket.name}{isComplete && champion ? ` — 🏆 #${champion.seed} ${champion.name}` : ''}
       </div>
 
       {/* Champion banner (only if complete) */}
@@ -106,7 +105,16 @@ export function BracketViewScreen() {
           Edit Bracket
         </Button>
 
-        <Button variant="secondary" onClick={() => window.print()}>
+        <Button variant="secondary" onClick={() => {
+          // Pre-apply print sizing so ResizeObserver fires and SVG connectors
+          // re-measure at print dimensions before Chrome captures the page.
+          // Need enough delay for: ResizeObserver → rAF → measure → React render
+          document.documentElement.classList.add('print-mode')
+          setTimeout(() => {
+            window.print()
+            document.documentElement.classList.remove('print-mode')
+          }, 500)
+        }}>
           Print Bracket
         </Button>
 

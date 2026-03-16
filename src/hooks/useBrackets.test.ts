@@ -27,7 +27,6 @@ describe('useBrackets', () => {
 
     expect(result.current.brackets).toHaveLength(1)
     expect(result.current.brackets[0].name).toBe("Emma's Bracket")
-    expect(result.current.brackets[0].locked).toBe(false)
     expect(result.current.brackets[0].picks).toEqual({})
     expect(bracket!.bracketId).toBeTruthy()
 
@@ -79,7 +78,7 @@ describe('useBrackets', () => {
     expect(updated!.picks['East-R1-G1']).toBe('duke')
   })
 
-  it('locks and unlocks a bracket', () => {
+  it('updates multiple picks on same bracket', () => {
     const { result } = renderHook(() => useBrackets())
 
     let bracket: ReturnType<typeof result.current.createBracket>
@@ -88,14 +87,15 @@ describe('useBrackets', () => {
     })
 
     act(() => {
-      result.current.lockBracket(bracket!.bracketId)
+      result.current.updatePick(bracket!.bracketId, 'East-R1-G1', 'duke')
     })
-    expect(result.current.getBracket(bracket!.bracketId)!.locked).toBe(true)
-
     act(() => {
-      result.current.unlockBracket(bracket!.bracketId)
+      result.current.updatePick(bracket!.bracketId, 'East-R1-G2', 'ohio-state')
     })
-    expect(result.current.getBracket(bracket!.bracketId)!.locked).toBe(false)
+
+    const updated = result.current.getBracket(bracket!.bracketId)
+    expect(updated!.picks['East-R1-G1']).toBe('duke')
+    expect(updated!.picks['East-R1-G2']).toBe('ohio-state')
   })
 
   it('reads existing data from localStorage on mount', () => {
@@ -107,7 +107,6 @@ describe('useBrackets', () => {
           name: 'Existing',
           createdAt: '2026-03-15T00:00:00Z',
           updatedAt: '2026-03-15T00:00:00Z',
-          locked: false,
           picks: { 'East-R1-G1': 'duke' },
         },
       ],

@@ -20,7 +20,7 @@ import { ErrorState } from '../components/ErrorState'
 export function PickFlowScreen() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { getBracket, updatePick, lockBracket } = useBrackets()
+  const { getBracket, updatePick } = useBrackets()
   const { teams, loading: teamsLoading, error: teamsError } = useTeams()
 
   const bracket = getBracket(id ?? '')
@@ -47,8 +47,6 @@ export function PickFlowScreen() {
     }
   }, [bracket, gameOrder, games, currentIndex])
 
-  // Auto-complete is handled inside handlePick, not in an effect,
-  // so editing a completed bracket doesn't trigger an infinite loop.
 
   // Preload images for the next few matchups so transitions are instant
   const preloadedUrls = useRef(new Set<string>())
@@ -97,14 +95,16 @@ export function PickFlowScreen() {
       if (invalidated.length > 0) {
         setInvalidatedMessage(`Changed pick — ${invalidated.length} later pick${invalidated.length > 1 ? 's' : ''} were reset`)
         setTimeout(() => setInvalidatedMessage(null), 3000)
-      }
 
-      // Check if bracket is now complete (63 picks)
-      const updatedPicks = { ...bracket.picks, [gameId]: teamId }
-      const { made, total } = getBracketProgress(updatedPicks)
-      if (made === total && total === 63) {
-        lockBracket(bracket.bracketId)
-        navigate(`/bracket/${bracket.bracketId}/view`, { replace: true })
+        // Jump to first unpicked game after invalidation
+        const updatedPicks = { ...bracket.picks, [gameId]: teamId }
+        for (const inv of invalidated) {
+          delete updatedPicks[inv]
+        }
+        const newCount = Object.keys(updatedPicks).length
+        pickCountOnMount.current = newCount - 1 // so completion redirect still works
+        const nextUnpicked = getNextUnpickedGameIndex(gameOrder, games, updatedPicks)
+        setCurrentIndex(nextUnpicked >= gameOrder.length ? gameOrder.length - 1 : nextUnpicked)
         return
       }
 
@@ -113,8 +113,24 @@ export function PickFlowScreen() {
         setCurrentIndex(currentIndex + 1)
       }
     },
-    [bracket, currentIndex, gameOrder, games, updatePick, lockBracket, navigate],
+    [bracket, currentIndex, gameOrder, games, updatePick],
   )
+
+  // After a pick is made in this session and the bracket is complete, navigate to view.
+  // We track pick count so localStorage re-reads on mount don't trigger a false redirect.
+  const pickCountOnMount = useRef<number | null>(null)
+  useEffect(() => {
+    if (!bracket) return
+    const { made, total } = getBracketProgress(bracket.picks)
+    if (pickCountOnMount.current === null) {
+      pickCountOnMount.current = made
+      return
+    }
+    // Only redirect if a new pick was made in this session
+    if (made > pickCountOnMount.current && made === total && total === 63) {
+      navigate(`/bracket/${bracket.bracketId}/view`, { replace: true })
+    }
+  }, [bracket?.picks])
 
   const handleBack = useCallback(() => {
     if (currentIndex !== null && currentIndex > 0) {

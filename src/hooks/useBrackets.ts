@@ -54,7 +54,6 @@ export function useBrackets() {
         name,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        locked: false,
         picks: {},
       }
       persist([...brackets, bracket])
@@ -114,26 +113,6 @@ export function useBrackets() {
     [brackets, persist],
   )
 
-  const lockBracket = useCallback(
-    (bracketId: string): void => {
-      const updated = brackets.map((b) =>
-        b.bracketId === bracketId ? { ...b, locked: true, updatedAt: new Date().toISOString() } : b,
-      )
-      persist(updated)
-    },
-    [brackets, persist],
-  )
-
-  const unlockBracket = useCallback(
-    (bracketId: string): void => {
-      const updated = brackets.map((b) =>
-        b.bracketId === bracketId ? { ...b, locked: false, updatedAt: new Date().toISOString() } : b,
-      )
-      persist(updated)
-    },
-    [brackets, persist],
-  )
-
   return {
     brackets,
     storageError,
@@ -141,7 +120,5 @@ export function useBrackets() {
     deleteBracket,
     getBracket,
     updatePick,
-    lockBracket,
-    unlockBracket,
   }
 }

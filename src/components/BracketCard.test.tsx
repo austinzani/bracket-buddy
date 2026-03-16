@@ -8,7 +8,6 @@ const makeBracket = (overrides?: Partial<Bracket>): Bracket => ({
   name: "Emma's Bracket",
   createdAt: '2026-03-15T10:00:00Z',
   updatedAt: '2026-03-15T11:00:00Z',
-  locked: false,
   picks: {},
   ...overrides,
 })

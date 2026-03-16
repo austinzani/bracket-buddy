@@ -2,7 +2,7 @@
   /* Landscape 8.5×11 with minimal margins */
   @page {
     size: 11in 8.5in;
-    margin: 0.2in;
+    margin: 0.15in;
   }
 
   /* Reset everything */
@@ -13,7 +13,7 @@
   body {
     background: #ffffff !important;
     color: #000000 !important;
-    font-size: 6px !important;
+    font-size: 8px !important;
     margin: 0 !important;
     padding: 0 !important;
   }
@@ -40,11 +40,13 @@
     overflow: visible !important;
   }
 
+  /* Page wrapper becomes relative positioning context */
   #root > div {
     max-width: none !important;
-    padding: 2px !important;
+    padding: 0 !important;
     min-height: auto !important;
     height: auto !important;
+    position: relative !important;
   }
 
   /* Hide UI chrome */
@@ -55,41 +57,26 @@
     display: none !important;
   }
 
-  /* === TITLE === */
+  /* === TITLE: absolutely positioned at top center === */
   [data-print-title] {
     display: block !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
     text-align: center;
-    font-size: 9px !important;
+    font-size: 10px !important;
     font-weight: 800;
-    margin: 0 0 1px 0 !important;
+    margin: 0 !important;
     padding: 0 !important;
     color: #000000 !important;
+    z-index: 10 !important;
+    white-space: nowrap !important;
   }
 
-  /* === CHAMPION BANNER: compact single line === */
+  /* === CHAMPION BANNER: hide the screen version, show inline in title area === */
   [data-champion-banner] {
-    padding: 0 0 1px 0 !important;
-    gap: 4px !important;
-    margin: 0 !important;
-  }
-
-  [data-champion-banner] h1 {
-    font-size: 7px !important;
-    background: none !important;
-    -webkit-text-fill-color: #000000 !important;
-    color: #000000 !important;
-    margin: 0 !important;
-  }
-
-  [data-champion-banner] > div {
-    font-size: 7px !important;
-    padding: 1px 4px !important;
-    border-radius: 2px !important;
-  }
-
-  [data-champion-banner] img {
-    width: 10px !important;
-    height: 10px !important;
+    display: none !important;
   }
 
   [data-champion-card] {
@@ -112,7 +99,7 @@
 
   /* Each side (left/right stack of 2 regions) */
   [data-bracket-side] {
-    gap: 4px !important;
+    gap: 6px !important;
   }
 
   /* Region (horizontal row of round columns) */
@@ -127,27 +114,30 @@
 
   /* Region / Final Four / Championship labels */
   [data-bracket-label] {
-    font-size: 5px !important;
-    margin-bottom: 1px !important;
+    font-size: 7px !important;
+    margin-bottom: 2px !important;
     letter-spacing: 0.5px !important;
   }
 
-  /* === BRACKET SLOTS: dramatically smaller === */
+  /* === BRACKET SLOTS: sized to fill page === */
   [data-bracket-slot] {
-    height: 11px !important;
-    min-height: 11px !important;
-    max-height: 11px !important;
-    min-width: 48px !important;
-    max-width: 68px !important;
-    padding: 0px 2px !important;
-    font-size: 5px !important;
-    gap: 2px !important;
-    border-radius: 1px !important;
+    height: 16px !important;
+    min-height: 16px !important;
+    max-height: 16px !important;
+    min-width: 70px !important;
+    max-width: 95px !important;
+    padding: 1px 3px !important;
+    font-size: 7px !important;
+    gap: 3px !important;
+    border-radius: 2px !important;
     border-width: 0.5px !important;
     background-color: #ffffff !important;
     color: #000000 !important;
     opacity: 1 !important;
     line-height: 1 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
   }
 
   /* Winner slot highlight */
@@ -156,10 +146,12 @@
     font-weight: 700 !important;
   }
 
-  /* Slot inner spans */
+  /* Slot inner spans - ensure text truncates */
   [data-bracket-slot] span {
-    font-size: 5px !important;
+    font-size: 7px !important;
     opacity: 1 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
   /* Hide images in slots */
@@ -167,30 +159,122 @@
     display: none !important;
   }
 
+  /* SVG connector columns */
+  [data-connector] {
+    width: 16px !important;
+    min-width: 16px !important;
+  }
+
+  [data-connector] svg {
+    overflow: visible !important;
+  }
+
+  [data-connector] path {
+    stroke-width: 0.75px !important;
+  }
+
   /* Center column */
   [data-center-column] {
-    min-width: 55px !important;
-    gap: 4px !important;
-    padding: 0 2px !important;
+    min-width: 75px !important;
+    gap: 6px !important;
+    padding: 0 4px !important;
   }
 
   /* Champion slot in center */
   [data-champion-slot] {
-    font-size: 6px !important;
-    padding: 2px 4px !important;
+    font-size: 8px !important;
+    padding: 3px 6px !important;
     border-radius: 2px !important;
     border-width: 1px !important;
     box-shadow: none !important;
   }
 
-  /* === FOOTER === */
+  /* === FOOTER: absolutely positioned at bottom === */
   [data-print-footer] {
     display: block !important;
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
     text-align: center;
     font-size: 5px;
-    color: #999;
-    margin-top: 1px;
-    border-top: 0.5px solid #ddd;
-    padding-top: 1px;
+    color: #aaa;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    z-index: 10 !important;
   }
+}
+
+/*
+ * Pre-print mode: applied via JS before window.print() so that
+ * ResizeObserver fires and SVG connectors re-measure at print dimensions.
+ * Duplicates the sizing rules that affect bracket layout.
+ */
+.print-mode [data-bracket-tree] {
+  overflow: visible !important;
+  width: 100% !important;
+}
+
+.print-mode [data-bracket-container] {
+  gap: 2px !important;
+  padding: 0 !important;
+}
+
+.print-mode [data-bracket-side] {
+  gap: 6px !important;
+}
+
+.print-mode [data-bracket-slot] {
+  height: 16px !important;
+  min-height: 16px !important;
+  max-height: 16px !important;
+  min-width: 70px !important;
+  max-width: 95px !important;
+  padding: 1px 3px !important;
+  font-size: 7px !important;
+  gap: 3px !important;
+  border-radius: 2px !important;
+  border-width: 0.5px !important;
+  line-height: 1 !important;
+  overflow: hidden !important;
+}
+
+.print-mode [data-bracket-slot] span {
+  font-size: 7px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.print-mode [data-bracket-slot] img {
+  display: none !important;
+}
+
+.print-mode [data-connector] {
+  width: 16px !important;
+  min-width: 16px !important;
+}
+
+.print-mode [data-connector] path {
+  stroke-width: 0.75px !important;
+}
+
+.print-mode [data-center-column] {
+  min-width: 75px !important;
+  gap: 6px !important;
+  padding: 0 4px !important;
+}
+
+.print-mode [data-champion-slot] {
+  font-size: 8px !important;
+  padding: 3px 6px !important;
+  border-radius: 2px !important;
+  border-width: 1px !important;
+  box-shadow: none !important;
+}
+
+.print-mode [data-bracket-label] {
+  font-size: 7px !important;
+  margin-bottom: 2px !important;
+  letter-spacing: 0.5px !important;
 }

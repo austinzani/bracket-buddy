@@ -28,7 +28,6 @@ export interface Bracket {
   name: string
   createdAt: string
   updatedAt: string
-  locked: boolean
   picks: Record<GameId, string> // gameId -> winning team id
 }
 
