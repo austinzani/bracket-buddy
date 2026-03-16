@@ -127,7 +127,7 @@ export function PickFlowScreen() {
       return
     }
     // Only redirect if a new pick was made in this session
-    if (made > pickCountOnMount.current && made === total && total === 63) {
+    if (made > pickCountOnMount.current && made === total) {
       navigate(`/bracket/${bracket.bracketId}/view`, { replace: true })
     }
   }, [bracket?.picks])
@@ -196,7 +196,7 @@ export function PickFlowScreen() {
           bracketName={bracket.name}
           currentGame={game}
           currentIndex={currentIndex}
-          totalGames={63}
+          totalGames={gameOrder.length}
           picksMade={getBracketProgress(bracket.picks).made}
         />
         <div style={{ textAlign: 'center', padding: '4rem 0' }}>
