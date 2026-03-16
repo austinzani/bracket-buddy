@@ -63,13 +63,20 @@ export function PickProgress({ bracketName, currentGame, currentIndex, totalGame
         </span>
 
         {/* Mini progress bar */}
-        <div style={{
-          width: 100,
-          height: 6,
-          backgroundColor: 'var(--color-border)',
-          borderRadius: 3,
-          overflow: 'hidden',
-        }}>
+        <div
+          style={{
+            width: 100,
+            height: 6,
+            backgroundColor: 'var(--color-border)',
+            borderRadius: 3,
+            overflow: 'hidden',
+          }}
+          role="progressbar"
+          aria-valuenow={picksMade}
+          aria-valuemin={0}
+          aria-valuemax={totalGames}
+          aria-label={`${picksMade} of ${totalGames} picks made`}
+        >
           <div style={{
             height: '100%',
             width: `${progressPct}%`,

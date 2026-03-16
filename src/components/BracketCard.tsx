@@ -74,7 +74,14 @@ export function BracketCard({ bracket, onContinue, onView, onDelete }: BracketCa
 
         {/* Progress bar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={progressBarBg}>
+          <div
+            style={progressBarBg}
+            role="progressbar"
+            aria-valuenow={made}
+            aria-valuemin={0}
+            aria-valuemax={total}
+            aria-label={`${made} of ${total} picks made`}
+          >
             <div style={{
               height: '100%',
               width: `${progressPct}%`,

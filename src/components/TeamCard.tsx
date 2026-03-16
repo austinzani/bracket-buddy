@@ -61,6 +61,7 @@ export function TeamCard({ team, selected = false, onClick, size = 'normal' }: T
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
       aria-label={onClick ? `Pick ${team.name}` : team.name}
+      aria-pressed={onClick ? selected : undefined}
       style={cardStyle}
       onClick={onClick}
       onKeyDown={handleKeyDown}
@@ -120,7 +121,7 @@ export function TeamCard({ team, selected = false, onClick, size = 'normal' }: T
           fontSize: '1.1rem',
           fontWeight: 800,
           zIndex: 2,
-        }}>
+        }} aria-hidden="true">
           ✓
         </div>
       )}

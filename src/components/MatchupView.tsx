@@ -28,14 +28,14 @@ const vsStyle: CSSProperties = {
 
 export function MatchupView({ teamA, teamB, selectedTeamId, onPick }: MatchupViewProps) {
   return (
-    <div style={containerStyle}>
+    <div style={containerStyle} role="group" aria-label="Matchup">
       <TeamCard
         team={teamA}
         selected={selectedTeamId === teamA.id}
         onClick={() => onPick(teamA.id)}
         size="large"
       />
-      <span style={vsStyle}>VS</span>
+      <span style={vsStyle} aria-hidden="true">VS</span>
       <TeamCard
         team={teamB}
         selected={selectedTeamId === teamB.id}

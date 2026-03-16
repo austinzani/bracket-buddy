@@ -179,7 +179,7 @@ export function PickFlowScreen() {
 
       {/* Invalidation message */}
       {invalidatedMessage && (
-        <div style={{
+        <div role="alert" style={{
           textAlign: 'center',
           padding: '0.5rem 1rem',
           marginBottom: '0.75rem',
