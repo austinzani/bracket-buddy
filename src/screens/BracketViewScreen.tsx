@@ -87,7 +87,7 @@ export function BracketViewScreen() {
 
       {/* Print-only footer */}
       <div data-print-footer="" style={{ display: 'none' }}>
-        Created with Bracket Buddies &middot; {printDate}
+        Created with Bracket Buddy &middot; {printDate}
       </div>
 
       {/* Action buttons */}

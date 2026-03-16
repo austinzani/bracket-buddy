@@ -1,4 +1,4 @@
-# Bracket Buddies
+# Bracket Buddy
 
 A kid-friendly March Madness bracket builder. Pick your winners round-by-round with big, colorful team cards and print your completed bracket to hang on the fridge.
 

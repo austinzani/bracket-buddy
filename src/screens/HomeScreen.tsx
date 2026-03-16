@@ -5,12 +5,6 @@ import { Button } from '../components/Button'
 import { BracketCard } from '../components/BracketCard'
 import type { CSSProperties } from 'react'
 
-const titleStyle: CSSProperties = {
-  fontSize: '2.5rem',
-  textAlign: 'center',
-  marginBottom: '0.25rem',
-}
-
 const subtitleStyle: CSSProperties = {
   textAlign: 'center',
   color: 'var(--color-text-muted)',
@@ -32,7 +26,13 @@ export function HomeScreen() {
 
   return (
     <Layout>
-      <h1 style={titleStyle}>🏀 Bracket Buddies</h1>
+      <div style={{ textAlign: 'center', marginBottom: '-2 rem' }}>
+        <img
+          src="/og-image.png"
+          alt="Bracket Buddy"
+          style={{ width: '320px', height: '320px', objectFit: 'contain' }}
+        />
+      </div>
       <p style={subtitleStyle}>Pick your March Madness winners!</p>
 
       <div style={{ textAlign: 'center', marginBottom: '2rem' }}>

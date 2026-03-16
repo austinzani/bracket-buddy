@@ -267,7 +267,7 @@ Stored in `/public/assets/jerseys/` and `/public/assets/mascots/`. Named by team
 ```json
 {
   "tournamentYear": 2026,
-  "appName": "Bracket Buddies",
+  "appName": "Bracket Buddy",
   "showSeedInCard": true,
   "pickOrder": "round-by-round"
 }
