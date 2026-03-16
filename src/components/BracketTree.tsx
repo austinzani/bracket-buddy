@@ -178,14 +178,34 @@ function BracketGame({
   let inputA: React.ReactNode
   let inputB: React.ReactNode
 
-  if (game.isFirstRound) {
-    const teamA = game.sourceA ? getTeamById(teams, game.sourceA) : undefined
-    const teamB = game.sourceB ? getTeamById(teams, game.sourceB) : undefined
+  // For the bracket tree, R1 games are always leaf nodes.
+  // Resolve each source to a team: direct team ID or play-in winner from picks.
+  const isLeaf = game.round === 1 || game.isFirstRound
+
+  if (isLeaf) {
+    const resolveTeam = (source: string) => {
+      // If source is a play-in game ID, look up the winner
+      if (games.has(source)) {
+        const winner = picks[source]
+        return winner ? getTeamById(teams, winner) : undefined
+      }
+      return source ? getTeamById(teams, source) : undefined
+    }
+    const resolveTeamId = (source: string): string | undefined => {
+      if (games.has(source)) return picks[source]
+      return source || undefined
+    }
+
+    const teamA = resolveTeam(game.sourceA)
+    const teamB = resolveTeam(game.sourceB)
+    const teamAId = resolveTeamId(game.sourceA)
+    const teamBId = resolveTeamId(game.sourceB)
+
     inputA = (
       <BracketSlot
         ref={topInputRef}
         team={teamA ?? null}
-        isWinner={winnerId !== undefined && winnerId === game.sourceA}
+        isWinner={winnerId !== undefined && winnerId === teamAId}
         compact
       />
     )
@@ -193,7 +213,7 @@ function BracketGame({
       <BracketSlot
         ref={bottomInputRef}
         team={teamB ?? null}
-        isWinner={winnerId !== undefined && winnerId === game.sourceB}
+        isWinner={winnerId !== undefined && winnerId === teamBId}
         compact
       />
     )

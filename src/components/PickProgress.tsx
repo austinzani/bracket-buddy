@@ -87,7 +87,7 @@ export function PickProgress({ bracketName, currentGame, currentIndex, totalGame
           }} />
         </div>
         <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
-          {picksMade}/63
+          {picksMade}/{totalGames}
         </span>
       </div>
     </div>
