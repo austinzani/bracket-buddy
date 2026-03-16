@@ -24,6 +24,7 @@ function makeSampleTeams(): Team[] {
         secondaryColor: '#FFFFFF',
         jerseyImage: '',
         mascotImage: '',
+        mascotCostumeImage: '',
       })
     }
   }

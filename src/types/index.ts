@@ -10,8 +10,9 @@ export interface Team {
   region: Region
   primaryColor: string
   secondaryColor: string
-  jerseyImage: string
-  mascotImage: string
+  jerseyImage: string // Image of the teams Basketball jersey even if someone is wearing it
+  mascotImage: string // Drawing of the mascot or school logo
+  mascotCostumeImage: string // Image of the school student who dresses up as the mascot for games or the pet representative
 }
 
 /**

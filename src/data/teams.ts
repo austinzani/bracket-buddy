@@ -22,6 +22,7 @@ function validateTeam(obj: unknown, index: number): Team {
     secondaryColor: String(record.secondaryColor),
     jerseyImage: String(record.jerseyImage ?? ''),
     mascotImage: String(record.mascotImage ?? ''),
+    mascotCostumeImage: String(record.mascotCostumeImage ?? ''),
   }
 }
 
