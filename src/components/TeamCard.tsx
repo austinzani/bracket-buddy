@@ -18,15 +18,12 @@ function getContrastColor(hex: string): string {
 
 export function TeamCard({ team, selected = false, onClick, size = 'normal' }: TeamCardProps) {
   const [mascotError, setMascotError] = useState(false)
-  const [jerseyError, setJerseyError] = useState(false)
-  const [mascotLoaded, setMascotLoaded] = useState(false)
-  const [jerseyLoaded, setJerseyLoaded] = useState(false)
+  const [costumeError, setCostumeError] = useState(false)
 
   const isLarge = size === 'large'
-  const cardHeight = isLarge ? 420 : 340
-  const textColor = team.secondaryColor || getContrastColor(team.primaryColor)
+  const textColor = getContrastColor(team.primaryColor)
   const hasMascot = team.mascotImage && !mascotError
-  const hasJersey = team.jerseyImage && !jerseyError
+  const hasCostume = team.mascotCostumeImage && !costumeError
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -37,15 +34,15 @@ export function TeamCard({ team, selected = false, onClick, size = 'normal' }: T
 
   const cardStyle: CSSProperties = {
     position: 'relative',
-    backgroundColor: team.primaryColor,
+    backgroundColor: '#ffffff',
     borderRadius: 'var(--radius)',
-    width: isLarge ? 340 : 280,
-    height: cardHeight,
+    width: isLarge ? '100%' : 280,
+    height: isLarge ? '100%' : 340,
     cursor: onClick ? 'pointer' : 'default',
     overflow: 'hidden',
     transition: 'transform 0.15s, box-shadow 0.15s',
     outline: 'none',
-    border: selected ? `4px solid ${textColor}` : '4px solid transparent',
+    border: `4px solid ${team.primaryColor}`,
     boxShadow: selected
       ? `0 0 0 4px ${team.primaryColor}, 0 8px 24px rgba(0,0,0,0.25)`
       : 'var(--shadow)',
@@ -54,6 +51,24 @@ export function TeamCard({ team, selected = false, onClick, size = 'normal' }: T
     alignItems: 'center',
     justifyContent: 'center',
     userSelect: 'none',
+  }
+
+  const imageSlotStyle: CSSProperties = {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 0,
+    minWidth: 0,
+    width: '100%',
+    overflow: 'hidden',
+  }
+
+  const imgStyle: CSSProperties = {
+    maxHeight: '95%',
+    maxWidth: '95%',
+    objectFit: 'contain',
+    filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))',
   }
 
   return (
@@ -93,9 +108,9 @@ export function TeamCard({ team, selected = false, onClick, size = 'normal' }: T
         position: 'absolute',
         top: 12,
         left: 12,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        color: '#ffffff',
-        fontSize: isLarge ? '1rem' : '0.85rem',
+        backgroundColor: team.primaryColor,
+        color: textColor,
+        fontSize: isLarge ? '1.1rem' : '0.85rem',
         fontWeight: 800,
         padding: '4px 10px',
         borderRadius: 8,
@@ -126,91 +141,62 @@ export function TeamCard({ team, selected = false, onClick, size = 'normal' }: T
         </div>
       )}
 
-      {/* Mascot image area */}
+      {/* Images stacked vertically, equal space */}
       <div style={{
         flex: 1,
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
-        position: 'relative',
         minHeight: 0,
+        padding: isLarge ? '12px 16px' : '8px 12px',
+        boxSizing: 'border-box',
+        gap: isLarge ? 8 : 4,
       }}>
-        {hasMascot ? (
-          <>
-            {!mascotLoaded && (
-              <div style={{
-                position: 'absolute',
-                width: '60%',
-                height: '60%',
-                backgroundColor: 'rgba(255,255,255,0.1)',
-                borderRadius: 'var(--radius-sm)',
-              }} />
-            )}
+        {/* Mascot / logo image */}
+        <div style={imageSlotStyle}>
+          {hasMascot ? (
             <img
               src={team.mascotImage}
               alt={`${team.name} mascot`}
-              loading="lazy"
               onError={() => setMascotError(true)}
-              onLoad={() => setMascotLoaded(true)}
-              style={{
-                maxHeight: '65%',
-                maxWidth: '70%',
-                objectFit: 'contain',
-                opacity: mascotLoaded ? 1 : 0,
-                transition: 'opacity 0.2s',
-                filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))',
-              }}
+              style={imgStyle}
             />
-          </>
-        ) : (
-          <div style={{
-            fontSize: isLarge ? '4rem' : '3rem',
-            opacity: 0.3,
-          }}>
-            🏀
-          </div>
-        )}
+          ) : (
+            <div style={{ fontSize: isLarge ? '5rem' : '3rem', opacity: 0.3 }}>🏀</div>
+          )}
+        </div>
+
+        {/* Mascot costume image */}
+        <div style={imageSlotStyle}>
+          {hasCostume ? (
+            <img
+              src={team.mascotCostumeImage}
+              alt={`${team.name} mascot costume`}
+              onError={() => setCostumeError(true)}
+              style={imgStyle}
+            />
+          ) : (
+            <div style={{ fontSize: isLarge ? '5rem' : '3rem', opacity: 0.3 }}>🏀</div>
+          )}
+        </div>
       </div>
 
-      {/* Jersey image (smaller, bottom-left) */}
-      {hasJersey && (
-        <>
-          {!jerseyLoaded && null}
-          <img
-            src={team.jerseyImage}
-            alt={`${team.name} jersey`}
-            loading="lazy"
-            onError={() => setJerseyError(true)}
-            onLoad={() => setJerseyLoaded(true)}
-            style={{
-              position: 'absolute',
-              bottom: 48,
-              left: 12,
-              height: isLarge ? 72 : 56,
-              objectFit: 'contain',
-              opacity: jerseyLoaded ? 0.85 : 0,
-              transition: 'opacity 0.2s',
-              filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.3))',
-            }}
-          />
-        </>
-      )}
-
-      {/* Team name */}
+      {/* Team name bar with team color */}
       <div style={{
         width: '100%',
-        padding: '12px 16px',
+        padding: isLarge ? '16px 16px' : '12px 16px',
         textAlign: 'center',
-        backgroundColor: 'rgba(0,0,0,0.2)',
+        backgroundColor: team.primaryColor,
+        flexShrink: 0,
       }}>
         <span style={{
           color: textColor,
           fontSize: isLarge ? '1.5rem' : '1.2rem',
           fontWeight: 800,
-          textShadow: '0 1px 3px rgba(0,0,0,0.3)',
         }}>
-          {team.shortName}
+          {team.name}
         </span>
       </div>
     </div>

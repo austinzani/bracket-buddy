@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useBrackets } from '../hooks/useBrackets'
 import { useTeams } from '../hooks/useTeams'
@@ -47,15 +47,34 @@ export function PickFlowScreen() {
     }
   }, [bracket, gameOrder, games, currentIndex])
 
-  // Check if all picks are made — auto-lock and navigate
+  // Auto-complete is handled inside handlePick, not in an effect,
+  // so editing a completed bracket doesn't trigger an infinite loop.
+
+  // Preload images for the next few matchups so transitions are instant
+  const preloadedUrls = useRef(new Set<string>())
   useEffect(() => {
-    if (!bracket) return
-    const { made, total } = getBracketProgress(bracket.picks)
-    if (made === total && total === 63) {
-      lockBracket(bracket.bracketId)
-      navigate(`/bracket/${bracket.bracketId}/view`, { replace: true })
+    if (!bracket || currentIndex === null || gameOrder.length === 0) return
+
+    const LOOKAHEAD = 3
+    for (let i = 1; i <= LOOKAHEAD; i++) {
+      const idx = currentIndex + i
+      if (idx >= gameOrder.length) break
+      const futureGameId = gameOrder[idx]
+      const [futureA, futureB] = getGameParticipants(futureGameId, games, bracket.picks)
+      for (const tid of [futureA, futureB]) {
+        if (!tid) continue
+        const t = getTeamById(teams, tid)
+        if (!t) continue
+        for (const url of [t.mascotImage, t.mascotCostumeImage]) {
+          if (url && !preloadedUrls.current.has(url)) {
+            preloadedUrls.current.add(url)
+            const img = new Image()
+            img.src = url
+          }
+        }
+      }
     }
-  }, [bracket, lockBracket, navigate])
+  }, [currentIndex, bracket, gameOrder, games, teams])
 
   const handlePick = useCallback(
     (teamId: string) => {
@@ -80,12 +99,21 @@ export function PickFlowScreen() {
         setTimeout(() => setInvalidatedMessage(null), 3000)
       }
 
+      // Check if bracket is now complete (63 picks)
+      const updatedPicks = { ...bracket.picks, [gameId]: teamId }
+      const { made, total } = getBracketProgress(updatedPicks)
+      if (made === total && total === 63) {
+        lockBracket(bracket.bracketId)
+        navigate(`/bracket/${bracket.bracketId}/view`, { replace: true })
+        return
+      }
+
       // Auto-advance to next game
       if (currentIndex < gameOrder.length - 1) {
         setCurrentIndex(currentIndex + 1)
       }
     },
-    [bracket, currentIndex, gameOrder, games, updatePick],
+    [bracket, currentIndex, gameOrder, games, updatePick, lockBracket, navigate],
   )
 
   const handleBack = useCallback(() => {
@@ -168,7 +196,13 @@ export function PickFlowScreen() {
   const canGoForward = currentPick && currentIndex < gameOrder.length - 1
 
   return (
-    <Layout>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh',
+      padding: '1rem 2rem',
+      boxSizing: 'border-box',
+    }}>
       <PickProgress
         bracketName={bracket.name}
         currentGame={game}
@@ -193,7 +227,7 @@ export function PickFlowScreen() {
         </div>
       )}
 
-      {/* Matchup */}
+      {/* Matchup — fills remaining space */}
       <MatchupView
         teamA={teamA}
         teamB={teamB}
@@ -206,7 +240,10 @@ export function PickFlowScreen() {
         display: 'flex',
         justifyContent: 'center',
         gap: '1rem',
-        marginTop: '1rem',
+        padding: '1rem 0',
+        flexShrink: 0,
+        position: 'relative',
+        zIndex: 10,
       }}>
         <Button
           variant="secondary"
@@ -219,7 +256,7 @@ export function PickFlowScreen() {
 
         <Button
           variant="secondary"
-          onClick={() => navigate('/')}
+          onClick={() => { window.location.href = '/' }}
           style={{ padding: '0.625rem 1.5rem', fontSize: '0.95rem' }}
         >
           Home
@@ -234,6 +271,6 @@ export function PickFlowScreen() {
           </Button>
         )}
       </div>
-    </Layout>
+    </div>
   )
 }

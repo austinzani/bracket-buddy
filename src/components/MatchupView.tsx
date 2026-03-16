@@ -11,11 +11,17 @@ interface MatchupViewProps {
 
 const containerStyle: CSSProperties = {
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'stretch',
   justifyContent: 'center',
   gap: '1.5rem',
-  padding: '1rem 0',
-  flexWrap: 'wrap',
+  flex: 1,
+  minHeight: 0,
+  padding: '8px 0',
+}
+
+const cardWrapperStyle: CSSProperties = {
+  flex: '1 1 45%',
+  display: 'flex',
 }
 
 const vsStyle: CSSProperties = {
@@ -24,24 +30,32 @@ const vsStyle: CSSProperties = {
   color: 'var(--color-text-muted)',
   userSelect: 'none',
   flexShrink: 0,
+  display: 'flex',
+  alignItems: 'center',
 }
 
 export function MatchupView({ teamA, teamB, selectedTeamId, onPick }: MatchupViewProps) {
   return (
     <div style={containerStyle} role="group" aria-label="Matchup">
-      <TeamCard
-        team={teamA}
-        selected={selectedTeamId === teamA.id}
-        onClick={() => onPick(teamA.id)}
-        size="large"
-      />
+      <div style={cardWrapperStyle}>
+        <TeamCard
+          key={teamA.id}
+          team={teamA}
+          selected={selectedTeamId === teamA.id}
+          onClick={() => onPick(teamA.id)}
+          size="large"
+        />
+      </div>
       <span style={vsStyle} aria-hidden="true">VS</span>
-      <TeamCard
-        team={teamB}
-        selected={selectedTeamId === teamB.id}
-        onClick={() => onPick(teamB.id)}
-        size="large"
-      />
+      <div style={cardWrapperStyle}>
+        <TeamCard
+          key={teamB.id}
+          team={teamB}
+          selected={selectedTeamId === teamB.id}
+          onClick={() => onPick(teamB.id)}
+          size="large"
+        />
+      </div>
     </div>
   )
 }

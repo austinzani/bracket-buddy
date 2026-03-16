@@ -28,10 +28,11 @@ describe('TeamCard', () => {
     expect(screen.getByText('#1')).toBeDefined()
   })
 
-  it('sets background color to primary color', () => {
+  it('has white background with team color border', () => {
     const { container } = render(<TeamCard team={makeTeam()} />)
     const card = container.firstChild as HTMLElement
-    expect(card.style.backgroundColor).toBe('rgb(0, 48, 135)')
+    expect(card.style.backgroundColor).toBe('rgb(255, 255, 255)')
+    expect(card.style.border).toContain('rgb(0, 48, 135)')
   })
 
   it('renders mascot image', () => {
@@ -45,7 +46,7 @@ describe('TeamCard', () => {
     render(<TeamCard team={makeTeam({ mascotImage: '' })} />)
     // Should show basketball fallback, no broken image
     expect(screen.queryByAltText('Duke Blue Devils mascot')).toBeNull()
-    expect(screen.getByText('🏀')).toBeDefined()
+    expect(screen.getAllByText('🏀').length).toBeGreaterThan(0)
   })
 
   it('handles mascot image error by showing fallback', () => {
@@ -53,7 +54,7 @@ describe('TeamCard', () => {
     const img = screen.getByAltText('Duke Blue Devils mascot')
     fireEvent.error(img)
     // After error, the image should be replaced by fallback
-    expect(screen.getByText('🏀')).toBeDefined()
+    expect(screen.getAllByText('🏀').length).toBeGreaterThan(0)
   })
 
   it('shows checkmark when selected', () => {
@@ -101,7 +102,7 @@ describe('TeamCard', () => {
   it('renders large variant', () => {
     const { container } = render(<TeamCard team={makeTeam()} size="large" />)
     const card = container.firstChild as HTMLElement
-    expect(card.style.width).toBe('340px')
-    expect(card.style.height).toBe('420px')
+    expect(card.style.width).toBe('100%')
+    expect(card.style.height).toBe('100%')
   })
 })

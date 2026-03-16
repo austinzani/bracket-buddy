@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useBrackets } from '../hooks/useBrackets'
 import { useTeams } from '../hooks/useTeams'
@@ -16,7 +15,6 @@ export function BracketViewScreen() {
   const navigate = useNavigate()
   const { getBracket, unlockBracket } = useBrackets()
   const { teams, loading: teamsLoading, error: teamsError } = useTeams()
-  const [showUnlockConfirm, setShowUnlockConfirm] = useState(false)
 
   const bracket = getBracket(id ?? '')
 
@@ -54,7 +52,7 @@ export function BracketViewScreen() {
   const championId = bracket.picks['Championship']
   const champion = championId ? getTeamById(teams, championId) : undefined
 
-  const handleUnlock = () => {
+  const handleEdit = () => {
     unlockBracket(bracket.bracketId)
     navigate(`/bracket/${bracket.bracketId}`)
   }
@@ -62,7 +60,7 @@ export function BracketViewScreen() {
   const printDate = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 
   return (
-    <Layout>
+    <div style={{ padding: '1rem', minHeight: '100vh' }}>
       {/* Print-only title */}
       <div data-print-title="" style={{ display: 'none' }}>
         {bracket.name}
@@ -75,16 +73,18 @@ export function BracketViewScreen() {
 
       {/* Incomplete bracket header */}
       {!isComplete && (
-        <div data-print-hide="" style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-          <h1 style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>{bracket.name}</h1>
+        <div data-print-hide="" style={{ textAlign: 'center', padding: '0.75rem 0' }}>
+          <h1 style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>{bracket.name}</h1>
           <p style={{ color: 'var(--color-text-muted)' }}>
             {made} of {total} picks made
           </p>
         </div>
       )}
 
-      {/* Bracket tree */}
-      <BracketTree teams={teams} picks={bracket.picks} />
+      {/* Bracket tree — full width, isolation prevents scroll area from overlaying buttons */}
+      <div style={{ isolation: 'isolate' }}>
+        <BracketTree teams={teams} picks={bracket.picks} />
+      </div>
 
       {/* Print-only footer */}
       <div data-print-footer="" style={{ display: 'none' }}>
@@ -97,52 +97,44 @@ export function BracketViewScreen() {
         justifyContent: 'center',
         flexWrap: 'wrap',
         gap: '0.75rem',
-        marginTop: '2rem',
-        paddingBottom: '2rem',
+        marginTop: '1rem',
+        paddingBottom: '1rem',
+        position: 'relative',
+        zIndex: 10,
       }}>
-        {bracket.locked ? (
-          showUnlockConfirm ? (
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '0.5rem',
-            }}>
-              <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
-                Are you sure? This will let you change your picks.
-              </p>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <Button variant="danger" onClick={handleUnlock}>
-                  Yes, Unlock
-                </Button>
-                <Button variant="secondary" onClick={() => setShowUnlockConfirm(false)}>
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <Button variant="secondary" onClick={() => setShowUnlockConfirm(true)}>
-              🔓 Unlock to Edit
-            </Button>
-          )
-        ) : (
-          <Button onClick={() => navigate(`/bracket/${bracket.bracketId}`)}>
-            Continue Picking
-          </Button>
-        )}
+        <Button variant="secondary" onClick={handleEdit}>
+          Edit Bracket
+        </Button>
 
         <Button variant="secondary" onClick={() => window.print()}>
-          🖨️ Print Bracket
+          Print Bracket
         </Button>
 
         <Button variant="secondary" onClick={() => navigate('/new')}>
           Start Another Bracket
         </Button>
 
-        <Button variant="secondary" onClick={() => navigate('/')}>
+        <a
+          href="/"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '0.875rem 2rem',
+            fontSize: '1.125rem',
+            fontWeight: 700,
+            fontFamily: 'inherit',
+            border: 'none',
+            borderRadius: 'var(--radius-sm)',
+            cursor: 'pointer',
+            backgroundColor: 'var(--color-secondary)',
+            color: '#ffffff',
+            textDecoration: 'none',
+          }}
+        >
           Home
-        </Button>
+        </a>
       </div>
-    </Layout>
+    </div>
   )
 }

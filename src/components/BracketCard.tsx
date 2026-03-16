@@ -7,6 +7,7 @@ interface BracketCardProps {
   bracket: Bracket
   onContinue: (bracketId: string) => void
   onView: (bracketId: string) => void
+  onEdit: (bracketId: string) => void
   onDelete: (bracketId: string) => void
 }
 
@@ -29,7 +30,7 @@ const progressBarBg: CSSProperties = {
   overflow: 'hidden',
 }
 
-export function BracketCard({ bracket, onContinue, onView, onDelete }: BracketCardProps) {
+export function BracketCard({ bracket, onContinue, onView, onEdit, onDelete }: BracketCardProps) {
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const { made, total } = getBracketProgress(bracket.picks)
   const isComplete = made === total
@@ -59,11 +60,6 @@ export function BracketCard({ bracket, onContinue, onView, onDelete }: BracketCa
               borderRadius: 999,
             }}>
               Complete
-            </span>
-          )}
-          {bracket.locked && (
-            <span style={{ fontSize: '0.875rem' }} title="Bracket locked">
-              🔒
             </span>
           )}
         </div>
@@ -99,9 +95,14 @@ export function BracketCard({ bracket, onContinue, onView, onDelete }: BracketCa
       {/* Actions */}
       <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
         {isComplete ? (
-          <Button variant="secondary" onClick={() => onView(bracket.bracketId)} style={{ padding: '0.5rem 1.25rem', fontSize: '0.9rem' }}>
-            View
-          </Button>
+          <>
+            <Button variant="secondary" onClick={() => onView(bracket.bracketId)} style={{ padding: '0.5rem 1.25rem', fontSize: '0.9rem' }}>
+              View
+            </Button>
+            <Button variant="secondary" onClick={() => onEdit(bracket.bracketId)} style={{ padding: '0.5rem 1.25rem', fontSize: '0.9rem' }}>
+              Edit
+            </Button>
+          </>
         ) : (
           <Button onClick={() => onContinue(bracket.bracketId)} style={{ padding: '0.5rem 1.25rem', fontSize: '0.9rem' }}>
             Continue

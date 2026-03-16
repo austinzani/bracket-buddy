@@ -35,7 +35,7 @@ const emptySlotStyle: CSSProperties = {
 export function BracketSlot({ team, isWinner = false, compact = false }: BracketSlotProps) {
   if (!team) {
     return (
-      <div style={emptySlotStyle}>
+      <div data-bracket-slot="" style={emptySlotStyle}>
         <span style={{ fontSize: '0.7rem' }}>TBD</span>
       </div>
     )
@@ -47,6 +47,8 @@ export function BracketSlot({ team, isWinner = false, compact = false }: Bracket
 
   return (
     <div
+      data-bracket-slot=""
+      data-winner={isWinner ? '' : undefined}
       style={{
         ...slotStyle,
         backgroundColor: bgColor,

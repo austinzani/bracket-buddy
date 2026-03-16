@@ -17,6 +17,7 @@ describe('BracketCard', () => {
   const defaultProps = {
     onContinue: vi.fn(),
     onView: vi.fn(),
+    onEdit: vi.fn(),
     onDelete: vi.fn(),
   }
 
@@ -93,8 +94,10 @@ describe('BracketCard', () => {
     expect(screen.getByRole('button', { name: /Delete/ })).toBeDefined()
   })
 
-  it('shows lock icon when bracket is locked', () => {
-    render(<BracketCard bracket={makeBracket({ locked: true })} {...defaultProps} />)
-    expect(screen.getByTitle('Bracket locked')).toBeDefined()
+  it('shows Edit button for complete brackets', () => {
+    const picks: Record<string, string> = {}
+    for (let i = 0; i < 63; i++) picks[`game-${i}`] = 'team'
+    render(<BracketCard bracket={makeBracket({ picks })} {...defaultProps} />)
+    expect(screen.getByRole('button', { name: 'Edit' })).toBeDefined()
   })
 })

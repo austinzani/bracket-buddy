@@ -28,7 +28,7 @@ const emptyStateStyle: CSSProperties = {
 
 export function HomeScreen() {
   const navigate = useNavigate()
-  const { brackets, deleteBracket } = useBrackets()
+  const { brackets, deleteBracket, unlockBracket } = useBrackets()
 
   return (
     <Layout>
@@ -57,6 +57,7 @@ export function HomeScreen() {
               bracket={bracket}
               onContinue={(id) => navigate(`/bracket/${id}`)}
               onView={(id) => navigate(`/bracket/${id}/view`)}
+              onEdit={(id) => { unlockBracket(id); navigate(`/bracket/${id}`) }}
               onDelete={deleteBracket}
             />
           ))}
