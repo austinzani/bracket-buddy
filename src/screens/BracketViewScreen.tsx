@@ -98,7 +98,12 @@ export function BracketViewScreen() {
 
       {/* Champion banner (only if complete) */}
       {isComplete && champion && (
-        <ChampionBanner champion={champion} />
+        <>
+          <ChampionBanner champion={champion} />
+          <div data-print-hide="" style={{ textAlign: 'center', marginBottom: '0.25rem' }}>
+            <h1 style={{ fontSize: '1.5rem', margin: 0 }}>{bracket.name}</h1>
+          </div>
+        </>
       )}
 
       {/* Incomplete bracket header */}
