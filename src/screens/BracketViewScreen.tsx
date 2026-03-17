@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPrint, faPenToSquare, faArrowUpFromBracket, faHouse, faTrophy } from '@fortawesome/free-solid-svg-icons'
 import { useBrackets } from '../hooks/useBrackets'
 import { useTeams } from '../hooks/useTeams'
 import { getBracketProgress } from '../data/bracket'
@@ -17,7 +19,7 @@ export function BracketViewScreen() {
   const navigate = useNavigate()
   const { getBracket } = useBrackets()
   const { teams, loading: teamsLoading, error: teamsError } = useTeams()
-  const [shareLabel, setShareLabel] = useState('Share Bracket')
+  const [shareLabel, setShareLabel] = useState('Share')
 
   const bracket = getBracket(id ?? '')
 
@@ -80,7 +82,7 @@ export function BracketViewScreen() {
     try {
       await navigator.clipboard.writeText(shareUrl)
       setShareLabel('Link Copied!')
-      setTimeout(() => setShareLabel('Share Bracket'), 2000)
+      setTimeout(() => setShareLabel('Share'), 2000)
     } catch {
       // Last resort: prompt
       window.prompt('Copy this share link:', shareUrl)
@@ -93,7 +95,7 @@ export function BracketViewScreen() {
     <div data-bracket-page="" style={{ padding: '1rem', minHeight: '100vh' }}>
       {/* Print-only title (includes champion if complete) */}
       <div data-print-title="" style={{ display: 'none' }}>
-        {bracket.name}{isComplete && champion ? ` — 🏆 #${champion.seed} ${champion.name}` : ''}
+        {bracket.name}{isComplete && champion ? <>{' — '}<FontAwesomeIcon icon={faTrophy} /> #{champion.seed} {champion.name}</> : ''}
       </div>
 
       {/* Champion banner (only if complete) */}
@@ -137,51 +139,27 @@ export function BracketViewScreen() {
         position: 'relative',
         zIndex: 10,
       }}>
-        <Button variant="secondary" onClick={handleEdit}>
-          Edit Bracket
-        </Button>
-
         <Button variant="secondary" onClick={() => {
-          // Pre-apply print sizing so ResizeObserver fires and SVG connectors
-          // re-measure at print dimensions before Chrome captures the page.
-          // Need enough delay for: ResizeObserver → rAF → measure → React render
           document.documentElement.classList.add('print-mode')
           setTimeout(() => {
             window.print()
             document.documentElement.classList.remove('print-mode')
           }, 500)
         }}>
-          Print Bracket
+          <FontAwesomeIcon icon={faPrint} /> Print
+        </Button>
+
+        <Button variant="secondary" onClick={handleEdit}>
+          <FontAwesomeIcon icon={faPenToSquare} /> Edit
         </Button>
 
         <Button variant="secondary" onClick={handleShare}>
-          {shareLabel}
+          <FontAwesomeIcon icon={faArrowUpFromBracket} /> {shareLabel}
         </Button>
 
-        <Button variant="secondary" onClick={() => navigate('/new')}>
-          Start Another Bracket
+        <Button variant="secondary" onClick={() => navigate('/')}>
+          <FontAwesomeIcon icon={faHouse} /> Home
         </Button>
-
-        <a
-          href="/"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '0.875rem 2rem',
-            fontSize: '1.125rem',
-            fontWeight: 700,
-            fontFamily: 'inherit',
-            border: 'none',
-            borderRadius: 'var(--radius-sm)',
-            cursor: 'pointer',
-            backgroundColor: 'var(--color-secondary)',
-            color: '#ffffff',
-            textDecoration: 'none',
-          }}
-        >
-          Home
-        </a>
       </div>
     </div>
   )
