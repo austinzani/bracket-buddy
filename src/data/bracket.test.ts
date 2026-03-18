@@ -133,8 +133,12 @@ describe('generateBracketGames (no play-ins)', () => {
 
   it('Final Four sources are Elite 8 games', () => {
     const ff1 = games.get('FinalFour-G1')!
-    expect(ff1.sourceA).toBe('East-R4-G1')
+    expect(ff1.sourceA).toBe('Midwest-R4-G1')
     expect(ff1.sourceB).toBe('West-R4-G1')
+
+    const ff2 = games.get('FinalFour-G2')!
+    expect(ff2.sourceA).toBe('East-R4-G1')
+    expect(ff2.sourceB).toBe('South-R4-G1')
   })
 
   it('Championship sources are Final Four games', () => {

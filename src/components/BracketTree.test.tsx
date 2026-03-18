@@ -36,6 +36,21 @@ describe('BracketTree', () => {
     expect(screen.getByText('Midwest')).toBeDefined()
   })
 
+  it('groups regions by side as East/South and West/Midwest', () => {
+    const { container } = render(<BracketTree teams={teams} picks={{}} />)
+
+    const sides = container.querySelectorAll('[data-bracket-side]')
+    expect(sides).toHaveLength(2)
+
+    const leftRegionLabels = Array.from(sides[0].querySelectorAll('[data-region] [data-bracket-label]'))
+      .map((label) => label.textContent?.trim())
+    expect(leftRegionLabels).toEqual(['East', 'South'])
+
+    const rightRegionLabels = Array.from(sides[1].querySelectorAll('[data-region] [data-bracket-label]'))
+      .map((label) => label.textContent?.trim())
+    expect(rightRegionLabels).toEqual(['West', 'Midwest'])
+  })
+
   it('renders Final Four and Championship labels', () => {
     render(<BracketTree teams={teams} picks={{}} />)
     expect(screen.getAllByText('Final Four').length).toBe(2) // top and bottom
@@ -86,5 +101,21 @@ describe('BracketTree', () => {
     render(<BracketTree teams={teams} picks={picks} />)
     // Champion slot shows the team with trophy emoji
     expect(screen.getByText(/🏆.*E1/)).toBeDefined()
+  })
+
+  it('renders Final Four slots in visual order: East/South on top, Midwest/West on bottom', () => {
+    const picks = {
+      'FinalFour-G1': 'midwest-1',
+      'FinalFour-G2': 'east-1',
+    }
+    const { container } = render(<BracketTree teams={teams} picks={picks} />)
+
+    const centerColumn = container.querySelector('[data-center-column]')
+    expect(centerColumn).toBeTruthy()
+
+    const finalFourSlots = centerColumn!.querySelectorAll('[data-bracket-slot]')
+    expect(finalFourSlots).toHaveLength(2)
+    expect(finalFourSlots[0].textContent).toContain('E1')
+    expect(finalFourSlots[1].textContent).toContain('M1')
   })
 })

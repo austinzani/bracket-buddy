@@ -103,12 +103,12 @@ export function generateBracketGames(teams: Team[]): Map<GameId, Game> {
   }
 
   // Final Four: 2 games
-  // G1: East winner vs West winner, G2: South winner vs Midwest winner
+  // G1: Midwest winner vs West winner, G2: East winner vs South winner
   games.set('FinalFour-G1', {
     gameId: 'FinalFour-G1',
     round: 5,
     region: null,
-    sourceA: 'East-R4-G1',
+    sourceA: 'Midwest-R4-G1',
     sourceB: 'West-R4-G1',
     isFirstRound: false,
   })
@@ -116,8 +116,8 @@ export function generateBracketGames(teams: Team[]): Map<GameId, Game> {
     gameId: 'FinalFour-G2',
     round: 5,
     region: null,
-    sourceA: 'South-R4-G1',
-    sourceB: 'Midwest-R4-G1',
+    sourceA: 'East-R4-G1',
+    sourceB: 'South-R4-G1',
     isFirstRound: false,
   })
 

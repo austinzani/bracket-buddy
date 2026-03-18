@@ -318,10 +318,11 @@ function CenterColumn({
   picks: Record<GameId, string>
   teams: Team[]
 }) {
-  const ff1WinnerId = picks['FinalFour-G1']
-  const ff1Winner = ff1WinnerId ? getTeamById(teams, ff1WinnerId) : undefined
-  const ff2WinnerId = picks['FinalFour-G2']
-  const ff2Winner = ff2WinnerId ? getTeamById(teams, ff2WinnerId) : undefined
+  // Visual order is top: East vs South (FinalFour-G2), bottom: Midwest vs West (FinalFour-G1).
+  const topFinalFourWinnerId = picks['FinalFour-G2']
+  const topFinalFourWinner = topFinalFourWinnerId ? getTeamById(teams, topFinalFourWinnerId) : undefined
+  const bottomFinalFourWinnerId = picks['FinalFour-G1']
+  const bottomFinalFourWinner = bottomFinalFourWinnerId ? getTeamById(teams, bottomFinalFourWinnerId) : undefined
 
   const winnerId = picks['Championship']
   const winner = winnerId ? getTeamById(teams, winnerId) : undefined
@@ -336,12 +337,12 @@ function CenterColumn({
       padding: '0 8px',
       minWidth: 160,
     }}>
-      {/* Final Four G1 winner */}
+      {/* Final Four (East vs South) winner */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
         <div data-bracket-label="" style={centerLabelStyle}>Final Four</div>
         <BracketSlot
-          team={ff1Winner ?? null}
-          isWinner={ff1WinnerId !== undefined}
+          team={topFinalFourWinner ?? null}
+          isWinner={topFinalFourWinnerId !== undefined}
           compact
         />
       </div>
@@ -352,12 +353,12 @@ function CenterColumn({
         <ChampionSlot winner={winner} />
       </div>
 
-      {/* Final Four G2 winner */}
+      {/* Final Four (Midwest vs West) winner */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
         <div data-bracket-label="" style={centerLabelStyle}>Final Four</div>
         <BracketSlot
-          team={ff2Winner ?? null}
-          isWinner={ff2WinnerId !== undefined}
+          team={bottomFinalFourWinner ?? null}
+          isWinner={bottomFinalFourWinnerId !== undefined}
           compact
         />
       </div>
@@ -433,18 +434,18 @@ export function BracketTree({ teams, picks }: BracketTreeProps) {
         gap: 4,
         minWidth: 'min-content',
       }}>
-        {/* Left side: East on top, West below */}
+        {/* Left side: East on top, South below */}
         <div data-bracket-side="" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <RegionBracket region="East" games={games} picks={picks} teams={teams} />
-          <RegionBracket region="West" games={games} picks={picks} teams={teams} />
+          <RegionBracket region="South" games={games} picks={picks} teams={teams} />
         </div>
 
         {/* Center: Final Four + Championship */}
         <CenterColumn picks={picks} teams={teams} />
 
-        {/* Right side: South on top, Midwest below (mirrored) */}
+        {/* Right side: West on top, Midwest below (mirrored) */}
         <div data-bracket-side="" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <RegionBracket region="South" games={games} picks={picks} teams={teams} reverse />
+          <RegionBracket region="West" games={games} picks={picks} teams={teams} reverse />
           <RegionBracket region="Midwest" games={games} picks={picks} teams={teams} reverse />
         </div>
       </div>
